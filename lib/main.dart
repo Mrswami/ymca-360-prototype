@@ -9,6 +9,7 @@ import 'screens/profile_screen.dart';
 import 'screens/trainer_dashboard.dart';
 import 'screens/manager_dashboard.dart';
 import 'screens/classes_screen.dart';
+import 'screens/welcome_screen.dart';
 
 void main() {
   runApp(const YMCAApp());
@@ -24,10 +25,18 @@ class YMCAApp extends StatefulWidget {
 class _YMCAAppState extends State<YMCAApp> {
   // Key to force rebuild app on logout
   Key key = UniqueKey();
+  bool _isLoggedIn = false;
 
   void restartApp() {
     setState(() {
       key = UniqueKey();
+      _isLoggedIn = false;
+    });
+  }
+
+  void _login() {
+    setState(() {
+      _isLoggedIn = true;
     });
   }
 
@@ -37,7 +46,9 @@ class _YMCAAppState extends State<YMCAApp> {
       key: key,
       title: 'YMCA 360',
       theme: ymcaTheme,
-      home: MainShell(onRestart: restartApp),
+      home: _isLoggedIn 
+          ? MainShell(onRestart: restartApp) 
+          : WelcomeScreen(onLogin: _login),
       debugShowCheckedModeBanner: false,
     );
   }
