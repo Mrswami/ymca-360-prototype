@@ -52,53 +52,131 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   Future<void> _onConfirmBooking() async {
     if (_selectedSlot == null || _selectedTrainer == null) return;
 
-    // 1. Trigger Local Notification
-    await NotificationService.showBookingConfirmation(
-      _selectedTrainer!.name, 
-      _selectedSlot!,
-    );
-
-    // 2. Schedule Reminder (Demo: 10s later)
-    await NotificationService.scheduleReminder(
-      _selectedTrainer!.name, 
-      _selectedSlot!,
-    );
-
-    // 3. Show Success Dialog
-    if (!mounted) return;
+    // Show Payment Dialog
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Booking Confirmed!'),
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm & Pay'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Session with ${_selectedTrainer?.name}'),
-            const SizedBox(height: 8),
-            Text('${_weekdayName(_selectedDate.weekday)}, ${_selectedDate.day}'),
-            Text('@ ${_formatTime12h(_selectedSlot!)} - ${_formatTime12h(_selectedSlot!.add(Duration(minutes: _selectedDuration)))}'),
+            Row(
+              children: [
+                CircleAvatar(backgroundImage: NetworkImage('https://ui-avatars.com/api/?name=${_selectedTrainer!.name}'), radius: 16),
+                const SizedBox(width: 8),
+                Text('Session with ${_selectedTrainer!.name}', style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text(
+                  '${_selectedDate.month}/${_selectedDate.day} @ ${_formatTime12h(_selectedSlot!)}',
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Duration: ${_selectedDuration}m'),
+                Text('\$${_selectedDuration == 30 ? '40.00' : (_selectedDuration == 60 ? '70.00' : '95.00')}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
             const SizedBox(height: 16),
-            const Text('✔ Notification sent.\n✔ Reminder scheduled.', style: TextStyle(fontSize: 12, color: Colors.green)),
+            const Text('Payment Method', style: TextStyle(color: Colors.grey, fontSize: 12)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.grey.shade50,
+              ),
+              child: Row(
+                children: const [
+                  Icon(Icons.credit_card, color: AppColors.ymcaBlue),
+                  SizedBox(width: 12),
+                  Expanded(child: Text('Visa •••• 1234 (on file)')),
+                  Icon(Icons.check_circle, color: Colors.green, size: 18),
+                ],
+              ),
+            ),
           ],
         ),
         actions: [
-          TextButton.icon(
-            onPressed: () {
-              _addToGoogleCalendar();
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.ymcaBlue,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              Navigator.pop(context); // Close Payment Dialog
+              _processPaymentAndBook();
             },
+            child: const Text('Pay & Book'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _processPaymentAndBook() async {
+    // 1. Show Processing
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator(color: AppColors.ymcaBlue)),
+    );
+
+    // 2. Simulate Delay
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    Navigator.pop(context); // Close Spinner
+
+    // 3. Logic & Notifications
+    setState(() {
+       _selectedSlot = null;
+       _calculateSlots();
+    });
+
+    await NotificationService.showBookingConfirmation(
+      _selectedTrainer!.name, 
+      _selectedSlot ?? DateTime.now(), // Fallback if cleared too fast
+    );
+
+    // 4. Success Dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Column(
+          children: const [
+            Icon(Icons.check_circle, color: Colors.green, size: 48),
+            SizedBox(height: 8),
+            Text('Payment Successful'),
+          ],
+        ),
+        content: const Text(
+          'Your session has been confirmed and receipt sent to email.',
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton.icon(
+            onPressed: _addToGoogleCalendar,
             icon: const Icon(Icons.calendar_today),
             label: const Text('Add to Google Calendar'),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(ctx).pop(); // Close dialog
-              setState(() {
-                 _selectedSlot = null; // Reset selection
-                 _calculateSlots(); // Refresh slots (in real app, this would remove the taken slot)
-              });
-            },
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
             child: const Text('Done'),
           ),
         ],

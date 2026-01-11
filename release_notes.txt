@@ -1,0 +1,16 @@
+# Release Notes - YMCA 360 (v1.0.0)
+
+## 🚀 New Features
+*   **Smart Scheduling**: Book Personal Training sessions with real-time availability checking. supports 30, 60, and 90-minute slots.
+*   **Role-Based Access**: Experience the app as a Member, Trainer, or Manager.
+    *   *Trainers*: Manage your weekly availability directly in the app.
+    *   *Managers*: View member details and contact info.
+*   **Digital ID Card**: Quick-access barcode scanner for gym entry.
+*   **Calendar Integration**: Instantly add booked sessions to your Google Calendar.
+*   **Notifications**: Get instant confirmations and reminders for upcoming sessions.
+*   **On-Demand Workouts**: Browse our library of Yoga, Cardio, and Strength training videos.
+
+## 🛠 Improvements
+*   **Enhanced UI**: New visual design with immersive background imagery and a clean, readable interface.
+*   **Performance**: Optimized load times for the scheduling engine.
+*   **Permissions**: Updated support for Android 13+ Notification permissions.

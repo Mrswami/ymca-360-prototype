@@ -12,6 +12,7 @@ class AuthService {
 
   UserRole _currentRole = UserRole.member;
   String? _currentUserId;
+  bool hasPendingMFA = false; // Demo toggle
 
   UserRole get currentRole => _currentRole;
   String? get currentUserId => _currentUserId;

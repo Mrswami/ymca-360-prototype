@@ -8,6 +8,7 @@ import 'screens/workouts_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/trainer_dashboard.dart';
 import 'screens/manager_dashboard.dart';
+import 'screens/classes_screen.dart';
 
 void main() {
   runApp(const YMCAApp());
@@ -61,7 +62,7 @@ class _MainShellState extends State<MainShell> {
         return [
           const HomeScreen(),
           const SchedulerScreen(),
-          const WorkoutsScreen(),
+          const ClassesScreen(),
           const ProfileScreen(),
         ];
       case UserRole.trainer:
@@ -86,7 +87,7 @@ class _MainShellState extends State<MainShell> {
         return const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Book PT'),
-          BottomNavigationBarItem(icon: Icon(Icons.play_circle_fill), label: 'On Demand'),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_view_week), label: 'Classes'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ];
       case UserRole.trainer:
@@ -145,6 +146,17 @@ class _MainShellState extends State<MainShell> {
             subtitle: const Text('Admin Dashboard'),
             onTap: () {
               _auth.loginAsManager();
+              _reload();
+            },
+          ),
+          const Divider(),
+          SwitchListTile(
+            title: const Text('Simulate MFA Trigger'),
+            subtitle: const Text('Toggle "Action Required" alert'),
+            value: _auth.hasPendingMFA, 
+            activeColor: AppColors.ymcaBlue,
+            onChanged: (val) {
+              _auth.hasPendingMFA = val;
               _reload();
             },
           ),
