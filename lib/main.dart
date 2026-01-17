@@ -10,8 +10,13 @@ import 'screens/trainer_dashboard.dart';
 import 'screens/manager_dashboard.dart';
 import 'screens/classes_screen.dart';
 import 'screens/welcome_screen.dart';
+import 'screens/community_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; // Run `flutterfire configure` to generate this!
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const YMCAApp());
 }
 
@@ -74,6 +79,7 @@ class _MainShellState extends State<MainShell> {
           const HomeScreen(),
           const SchedulerScreen(),
           const ClassesScreen(),
+          const CommunityScreen(),
           const ProfileScreen(),
         ];
       case UserRole.trainer:
@@ -99,6 +105,7 @@ class _MainShellState extends State<MainShell> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Book PT'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_view_week), label: 'Classes'),
+          BottomNavigationBarItem(icon: Icon(Icons.groups), label: 'Community'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ];
       case UserRole.trainer:

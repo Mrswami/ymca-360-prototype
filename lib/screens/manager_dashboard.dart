@@ -1,70 +1,113 @@
 import 'package:flutter/material.dart';
-import '../data/mock_data.dart';
-import '../models/member.dart';
+import 'admin/user_management_screen.dart';
+import '../services/auth_service.dart';
 import '../theme/ymca_theme.dart';
 
-class ManagerDashboard extends StatelessWidget {
+class ManagerDashboard extends StatefulWidget {
   const ManagerDashboard({super.key});
 
   @override
+  State<ManagerDashboard> createState() => _ManagerDashboardState();
+}
+
+class _ManagerDashboardState extends State<ManagerDashboard> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Member Management')),
-      body: ListView.builder(
-        itemCount: MockData.generatedMembers.length,
-        itemBuilder: (context, index) {
-          final member = MockData.generatedMembers[index];
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(member.profileImage),
-              backgroundColor: Colors.grey.shade300,
-            ),
-            title: Text(member.fullName),
-            subtitle: Text(member.membershipType),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => _showMemberDetails(context, member),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {},
-      ),
-    );
-  }
-
-  void _showMemberDetails(BuildContext context, Member member) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(radius: 40, backgroundImage: NetworkImage(member.profileImage)),
-            const SizedBox(height: 16),
-            Text(member.fullName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            Text(member.membershipType, style: const TextStyle(color: AppColors.ymcaBlue, fontWeight: FontWeight.bold)),
-            const Divider(height: 32),
-            _detailRow(Icons.email, member.email),
-            const SizedBox(height: 12),
-            _detailRow(Icons.phone, member.phone),
-            const SizedBox(height: 12),
-            _detailRow(Icons.qr_code, member.barcode),
-          ],
+      appBar: AppBar(title: const Text('Admin Dashboard')),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 24),
+              const Text('Admin Tools', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              _buildAdminCard(
+                context,
+                icon: Icons.people_alt,
+                title: 'User Management',
+                subtitle: 'View and edit registered members (Firestore)',
+                color: Colors.purple,
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminUsersScreen())),
+              ),
+              const SizedBox(height: 16),
+              _buildAdminCard(
+                context,
+                icon: Icons.verified_user, // Was Icons.security
+                title: 'Income Verification',
+                subtitle: 'Review uploaded documents',
+                color: Colors.orange,
+                onTap: () {
+                   // Placeholder for document review screen
+                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Verification Queue: 0 Pending')));
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildMFAToggle(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _detailRow(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.grey),
-        const SizedBox(width: 16),
-        Text(text, style: const TextStyle(fontSize: 16)),
-      ],
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.ymcaBlue,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: const [
+          Icon(Icons.admin_panel_settings, size: 48, color: Colors.white),
+          SizedBox(height: 16),
+          Text('Manager Control Center', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+          Text('Access Level: Unrestricted', style: TextStyle(color: Colors.white70)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminCard(BuildContext context, {required IconData icon, required String title, required String subtitle, required Color color, required VoidCallback onTap}) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, color: color, size: 32),
+        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _buildMFAToggle() {
+    final authService = AuthService(); // Access singleton
+    // Note: State needs to track this, but AuthService isn't a ChangeNotifier stream here. 
+    // For demo simplicity, we toggle and setState.
+    return Card(
+      child: SwitchListTile(
+        title: const Text('Simulate MFA Trigger'),
+        subtitle: const Text('Show "Action Required" on Member Home'),
+        value: authService.hasPendingMFA,
+        activeColor: Colors.red,
+        onChanged: (val) {
+          setState(() {
+            authService.hasPendingMFA = val;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('MFA Alert turned ${val ? "ON" : "OFF"}')));
+        },
+      ),
     );
   }
 }

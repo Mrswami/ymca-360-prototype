@@ -1,16 +1,18 @@
-# Release Notes - YMCA 360 (v1.0.0)
+Release 1.0.0 (Demo Candidate)
+---------------------------------
+Features:
+- NEW: High-fidelity Welcome/Login Screen.
+- NEW: TownLake Class Schedule (Aquatics, Group Fitness).
+- NEW: "Verify Income" Administrative Flow (MFA).
+- NEW: Digital ID with Code128 Barcode for scanning.
+- NEW: Editable Profile with Emergency Contact & Address.
+- NEW: Payment Simulation ("Visa on File") for PT Booking.
 
-## 🚀 New Features
-*   **Smart Scheduling**: Book Personal Training sessions with real-time availability checking. supports 30, 60, and 90-minute slots.
-*   **Role-Based Access**: Experience the app as a Member, Trainer, or Manager.
-    *   *Trainers*: Manage your weekly availability directly in the app.
-    *   *Managers*: View member details and contact info.
-*   **Digital ID Card**: Quick-access barcode scanner for gym entry.
-*   **Calendar Integration**: Instantly add booked sessions to your Google Calendar.
-*   **Notifications**: Get instant confirmations and reminders for upcoming sessions.
-*   **On-Demand Workouts**: Browse our library of Yoga, Cardio, and Strength training videos.
+Fixes:
+- Updated "On Demand" tab to "Classes".
+- Fixed Android Notification Permissions for Android 13+.
+- Improved Home Screen aesthetic with "Action Required" alerts.
 
-## 🛠 Improvements
-*   **Enhanced UI**: New visual design with immersive background imagery and a clean, readable interface.
-*   **Performance**: Optimized load times for the scheduling engine.
-*   **Permissions**: Updated support for Android 13+ Notification permissions.
+Notes for Reviewers:
+- Use "Manager View" to toggle the MFA Alert.
+- Data resets on app restart.
