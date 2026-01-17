@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 // Import for platform specific params
@@ -42,8 +43,12 @@ class _ChildcareWebViewState extends State<ChildcareWebView> {
     final WebViewController controller =
         WebViewController.fromPlatformCreationParams(params);
 
+    // setJavaScriptMode is not supported on Web (it's always enabled/unrestricted by default on standard web browsers)
+    if (!kIsWeb) {
+      controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+    }
+
     controller
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
