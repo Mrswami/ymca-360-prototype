@@ -3,6 +3,8 @@ import '../widgets/ymca_background.dart';
 import '../theme/ymca_theme.dart';
 import '../services/auth_service.dart';
 import 'income_verification_screen.dart';
+import 'childcare_web_view.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -37,6 +39,12 @@ class HomeScreen extends StatelessWidget {
 
             // 2. Generic Gym Info (Common Sense Feature)
             _buildBranchInfo(context),
+            const SizedBox(height: 20),
+
+            // Programs & Services
+            const Text('Programs & Services', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            _buildServicesSection(context),
             const SizedBox(height: 20),
 
             // 3. Featured Promo (Existing but improved)
@@ -315,6 +323,76 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
           Text(label, style: const TextStyle(color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServicesSection(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildServiceCard(
+            context,
+            icon: Icons.child_care,
+            title: 'Childcare',
+            color: Colors.pink,
+            onTap: () => _showChildcareRedirectDialog(context),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildServiceCard(
+            context,
+            icon: Icons.pool,
+            title: 'Swim', // Shortened to fit
+            color: Colors.blue,
+            onTap: () {},
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildServiceCard(BuildContext context, {required IconData icon, required String title, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 100, // Fixed height for consistency
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 32),
+            const SizedBox(height: 8),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showChildcareRedirectDialog(BuildContext context) {
+    FirebaseAnalytics.instance.logEvent(name: 'childcare_reg_link_clicked');
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Leave App?'),
+        content: const Text('You are now being redirected to the YMCA\'s secure childcare registration portal, powered by ezchildtrack.\n\nYou will be able to return to this app when you are finished.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ChildcareWebView()));
+            },
+            child: const Text('Proceed'),
+          ),
         ],
       ),
     );

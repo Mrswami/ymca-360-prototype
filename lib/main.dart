@@ -16,7 +16,9 @@ import 'firebase_options.dart'; // Run `flutterfire configure` to generate this!
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Extract options to variable to prevent const evaluation issues
+  final options = DefaultFirebaseOptions.currentPlatform;
+  await Firebase.initializeApp(options: options);
   runApp(const YMCAApp());
 }
 

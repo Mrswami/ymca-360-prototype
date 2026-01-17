@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'admin/user_management_screen.dart';
 import '../services/auth_service.dart';
 import '../theme/ymca_theme.dart';
@@ -43,6 +44,24 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
                 onTap: () {
                    // Placeholder for document review screen
                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Verification Queue: 0 Pending')));
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildAdminCard(
+                context,
+                icon: Icons.analytics,
+                title: 'Analytics Dashboard',
+                subtitle: 'View registration & usage stats (Firebase)',
+                color: Colors.blue,
+                onTap: () async {
+                  final url = Uri.parse('https://console.firebase.google.com/u/0/project/_/analytics/reports/dashboard');
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } else {
+                     if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not launch Analytics')));
+                     }
+                  }
                 },
               ),
               const SizedBox(height: 16),
