@@ -1,43 +1,42 @@
-# Agent Handoff: YMCA 360 Prototype
+# Agent Handoff & Project Context
 
-**Last Updated:** January 10, 2026
-**Current Branch:** `master` (Merged from `feature/demo-enhancements`)
-**Goal:** High-fidelity Sales Pitch Prototype for Austin YMCA Executives.
+## Project: YMCA 360 Prototype (`example_app`)
+**Objective:** Create a modern, high-velocity prototype for a YMCA mobile/web app to showcase value over their existing legacy software stack.
 
-## 1. Project Context
-This is a **Flutter** app simulating the "YMCA 360" experience. It is designed to impress executives with "Common Sense" features like Digital ID, Class Schedules, and Admin Workflows (MFA Verification).
-*   **Target Device:** Samsung S23 (User's personal phone).
-*   **Web Host:** GitHub Pages (`/docs` folder).
+---
 
-## 2. Key Features Implemented
-*   **Welcome Screen**: Matches the official design (Dark mode, Hero image).
-*   **Role-Based Access**:
-    *   **Member**: Home, Classes, Book PT, Profile.
-    *   **Manager**: Dashboard with "Simulate MFA" toggle.
-    *   **Trainer**: Schedule Editor.
-*   **Digital ID (Home Tab)**: Tapping the barcode card opens a large Code128 barcode dialog.
-*   **Class Schedule (Classes Tab)**: Replaced generic "On Demand" with a TownLake-specific schedule (Aquatics, Group Fitness).
-*   **MFA Workflow**:
-    *   Toggle in Manager Menu (`Simulate MFA Trigger`).
-    *   Shows "Action Required" banner on Home.
-    *   User uploads doc -> Success.
-*   **Mock Payments**: `SchedulerScreen` simulates a "Visa on File" payment flow.
+## 🏗️ Architecture & Stack
+- **Framework:** Flutter (Mobile + Web support).
+- **Backend:** Firebase (Auth, Firestore, Hosting, Analytics).
+- **CI/CD:** GitHub Actions.
+    - `flutter_test.yml`: Runs unit tests on every push.
+    - `firebase_hosting_merge.yml`: Automatically builds and deploys to Firebase Hosting on merge to `master`.
 
-## 3. Technical State
-*   **Data**: All data is **Mock** (`MockData` class). Resets on app restart.
-*   **Auth**: Simulated via `AuthService`.
-*   **Notifications**: Uses `flutter_local_notifications`. Permissions logic added for Android 13+.
-*   **Signing**:
-    *   `debug` builds work perfectly.
-    *   `release` builds (`flutter build apk --release`) are currently **FAILING** due to `key.properties` configuration in `android/app/build.gradle.kts`.
-    *   *Workaround:* Use `--debug` builds for demo.
+## 🔄 Current Workflow (SOP)
+The project has moved from manual hacking to a professional CI/CD flow.
+1.  **Work in Branches:** Always use `git checkout -b feature/name`.
+2.  **Push to GitHub:** Triggers automated tests.
+3.  **Merge to Master:** Triggers automated deployment to `xmca14.web.app`.
 
-## 4. Next Steps for Next Agent
-1.  **Fix Release Signing**: The `build.gradle.kts` logic for reading `key.properties` is fragile. Needs a rewrite to reliably build release APKs/Bundles.
-2.  **Real Backend**: The user has requested a road map for Firebase/Daxko integration (See `ARCHITECTURE.md`).
-3.  **UI Polish**: The "Wellness" button on Welcome Screen is currently a blank placeholder.
+## ✅ Completed Features
+1.  **Childcare Registration:**
+    - Integrated `webview_flutter` to bridge users to `ezchildtrack.com`.
+    - Includes `ChildcareWebView` screen and Home Screen entry point.
+    - Handles Web vs. Native platform differences (Safe initialization).
+2.  **Manager Analytics:**
+    - Entry point in `ManagerDashboard` to view Firebase Analytics.
+3.  **Infrastructure:**
+    - Unit Tests setup (`test/user_model_test.dart`).
+    - CI/CD Pipelines established.
+    - Web support fixed (`setJavaScriptMode` error resolved).
 
-## 5. Critical Files
-*   `lib/main.dart`: Entry point. Handles `WelcomeScreen` -> `MainShell` transition and Tab Navigation.
-*   `lib/screens/home_screen.dart`: Contains the Digital ID logic and Location Picker.
-*   `lib/services/auth_service.dart`: Contains the `hasPendingMFA` demo toggle.
+## ⏭️ Next Steps (Backlog)
+- **Refactor State Management:** Migration from `setState` to Riverpod/Bloc is recommended for scalability.
+- **Data Pagination:** Firestore queries need limits/pagination before real-world load testing.
+- **Remote Config:** Hardcoded URLs (like `ezchildtrack`) should be moved to Firebase Remote Config.
+- **Dev Environment:** Create a separate `xmca14-dev` project to stop testing in production.
+
+## ⚠️ Important Notes for Agents
+- **Workspace Restrictions:** The user may have restricted terminal access. You might need to ask the user to switch active folders or run `git push` manually if the tool fails.
+- **Web Build:** Ensure any new packages have web support (`_web` variants) or are conditionally imported.
+- **Service Account:** The `FIREBASE_SERVICE_ACCOUNT_XMCA14` secret is set in GitHubRepo for deployment.
