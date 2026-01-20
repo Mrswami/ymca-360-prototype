@@ -21,9 +21,21 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   int _selectedDuration = 60; // 30, 60, 90
   List<DateTime> _availableSlots = [];
   DateTime? _selectedSlot;
+  final Set<String> _viewedDays = {}; // Track viewed notification bubbles
 
   // Data
   final List<Trainer> _trainers = MockData.trainers;
+
+  bool _hasSlots(DateTime date) {
+    if (_selectedTrainer == null) return false;
+    // Rapid check for availability using the service
+    return AvailabilityService.getAvailableSlots(
+      trainer: _selectedTrainer!,
+      existingAppointments: mockAppointments.where((a) => a.trainerId == _selectedTrainer!.id).toList(),
+      targetDate: date,
+      durationMinutes: _selectedDuration,
+    ).isNotEmpty;
+  }
 
   @override
   void initState() {
@@ -389,7 +401,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
     final dates = List.generate(7, (index) => DateTime.now().add(Duration(days: index)));
     
     return Container(
-      height: 80,
+      height: 90, // Increased height for bubble space
       color: Colors.white,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -399,31 +411,72 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
           final date = dates[index];
           final isSelected = isSameDay(_selectedDate, date);
           
+          final hasSlots = _hasSlots(date);
+          final dateKey = "${date.year}-${date.month}-${date.day}";
+          final showNotification = hasSlots && !_viewedDays.contains(dateKey);
+
           return GestureDetector(
             onTap: () {
               setState(() {
+                if (hasSlots && !_viewedDays.contains(dateKey)) {
+                  _viewedDays.add(dateKey);
+                }
                 _selectedDate = date;
                 _calculateSlots();
               });
             },
             child: Container(
-              width: 60,
+              width: 65,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.ymcaBlue : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected 
+                    ? AppColors.ymcaBlue 
+                    : (showNotification ? Colors.green.withOpacity(0.5) : Colors.transparent),
+                  width: showNotification ? 1.5 : 1,
+                ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
                 children: [
-                  Text(
-                    _weekdayName(date.weekday),
-                    style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : Colors.grey),
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _weekdayName(date.weekday),
+                          style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : Colors.grey),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          date.day.toString(),
+                          style: TextStyle(
+                            fontSize: 20, 
+                            fontWeight: FontWeight.bold, 
+                            color: isSelected ? Colors.white : (hasSlots ? Colors.black87 : Colors.grey)
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    date.day.toString(),
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.black),
-                  ),
+                   if (showNotification)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.green, // Notification Bubble
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                          boxShadow: [
+                             BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 2, offset: const Offset(0, 1))
+                          ]
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

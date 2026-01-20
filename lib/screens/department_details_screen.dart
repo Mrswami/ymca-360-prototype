@@ -150,6 +150,7 @@ class DepartmentDetailsScreen extends ConsumerStatefulWidget {
 
 class _DepartmentDetailsScreenState extends ConsumerState<DepartmentDetailsScreen> {
   bool isSubscribed = false;
+  final Set<String> _viewedDays = {}; // Format: "YYYY-MM-DD"
 
   @override
   Widget build(BuildContext context) {
@@ -310,7 +311,7 @@ class _DepartmentDetailsScreenState extends ConsumerState<DepartmentDetailsScree
     final now = DateTime.now();
     final days = List.generate(7, (index) => now.add(Duration(days: index)));
 
-    // Mock Availability Logic (e.g., availability on odd days)
+    // Mock Availability Logic
     bool isAvailable(DateTime date) => date.day % 2 != 0;
 
     return Container(
@@ -323,24 +324,33 @@ class _DepartmentDetailsScreenState extends ConsumerState<DepartmentDetailsScree
         itemBuilder: (context, index) {
           final date = days[index];
           final available = isAvailable(date);
-          final isSelected = false; // Could add state for selection
+          final dateKey = "${date.year}-${date.month}-${date.day}";
+          final hasNotification = available && !_viewedDays.contains(dateKey);
 
           return GestureDetector(
             onTap: () {
               if (available) {
+                // Mark as viewed
+                if (!_viewedDays.contains(dateKey)) {
+                  setState(() => _viewedDays.add(dateKey));
+                }
                 _showTimeSlots(context, date, data);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No availability on this day.')));
               }
             },
             child: Container(
-              width: 60,
+              width: 65,
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
                 color: available ? Colors.white : Colors.grey[100],
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: available ? data.color.withOpacity(0.5) : Colors.grey[300]!),
-                boxShadow: available ? [BoxShadow(color: data.color.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))] : [],
+                border: Border.all(
+                  color: available 
+                       ? (hasNotification ? data.color : Colors.grey.shade300) 
+                       : Colors.grey.shade200, 
+                  width: available ? 1.5 : 1
+                ),
               ),
               child: Stack(
                 children: [
@@ -360,17 +370,20 @@ class _DepartmentDetailsScreenState extends ConsumerState<DepartmentDetailsScree
                       ],
                     ),
                   ),
-                  if (available)
+                  if (hasNotification)
                     Positioned(
                       top: 6,
                       right: 6,
                       child: Container(
-                        width: 10,
-                        height: 10,
+                        width: 12,
+                        height: 12,
                         decoration: BoxDecoration(
-                          color: Colors.green, // "Notification Bubble"
+                          color: Colors.green, 
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 1.5),
+                          boxShadow: [
+                             BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 2, offset: const Offset(0, 1))
+                          ]
                         ),
                       ),
                     ),

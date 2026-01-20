@@ -54,13 +54,26 @@ class YMCAApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
+    if (authState.isLoading) {
+      return MaterialApp(
+        title: 'YMCA 360',
+        theme: ymcaTheme,
+        debugShowCheckedModeBanner: false,
+        home: const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
     return MaterialApp(
       title: 'YMCA 360',
       theme: ymcaTheme,
       home: authState.isLoggedIn 
           ? const MainShell() 
           : WelcomeScreen(
-              onLogin: () => ref.read(authProvider.notifier).loginAsMember('m1'),
+              onLogin: (remember) => ref.read(authProvider.notifier).loginAsMember('m1', rememberMe: remember),
             ),
       debugShowCheckedModeBanner: false,
     );
