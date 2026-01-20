@@ -73,7 +73,7 @@ class YMCAApp extends ConsumerWidget {
       home: authState.isLoggedIn 
           ? const MainShell() 
           : WelcomeScreen(
-              onLogin: (remember) => ref.read(authProvider.notifier).loginAsMember('m1', rememberMe: remember),
+              onLogin: (remember) => ref.read(authProvider.notifier).loginAsMember(rememberMe: remember),
             ),
       debugShowCheckedModeBanner: false,
     );
@@ -164,7 +164,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             title: const Text('Member View'),
             subtitle: const Text('James Moreno'),
             onTap: () {
-              authNotifier.loginAsMember('m1');
+              authNotifier.loginAsMember();
               Navigator.pop(context);
             },
           ),
@@ -173,7 +173,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             title: const Text('Trainer View'),
             subtitle: const Text('Sarah Connor (Instructor)'),
             onTap: () {
-              authNotifier.loginAsTrainer('t1');
+              authNotifier.loginAsTrainer();
               Navigator.pop(context);
             },
           ),
