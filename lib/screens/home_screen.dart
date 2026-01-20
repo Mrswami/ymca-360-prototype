@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import 'income_verification_screen.dart';
 import 'childcare_web_view.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/services.dart';
 import '../services/stripe_service.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -410,8 +411,13 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildDayPassCard(BuildContext context) {
     return GestureDetector(
       onTap: () async {
+        final authState = ref.read(authProvider);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Initializing Payment...')));
-        final success = await StripeService.instance.makePayment(10.00);
+        final success = await StripeService.instance.makePayment(
+          amount: 10.00,
+          userId: authState.userId ?? 'guest',
+          userName: 'Member', // Ideally fetch name from profile or config
+        );
         if (context.mounted) {
            if (success) {
              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Payment Successful! Welcome!'), backgroundColor: Colors.green));
@@ -426,26 +432,45 @@ class HomeScreen extends ConsumerWidget {
           gradient: const LinearGradient(colors: [Colors.purple, Colors.deepPurple]),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Row(
-          children: [
-             const Icon(Icons.confirmation_number, color: Colors.white, size: 30),
-             const SizedBox(width: 16),
-             const Expanded(
-               child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                    Text('Buy Day Pass (\$10)', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text('Instant access to gym & pool', style: TextStyle(color: Colors.white70, fontSize: 13)),
-                 ],
-               ),
-             ),
-             Container(
-               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-               child: const Text('Buy', style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold)),
-             )
-          ],
-        ),
+        child: Column( // Wrapped in Column to add the "Demo Helper" below if needed inside, or just return column of widgets
+         children: [
+            Row(
+              children: [
+                 const Icon(Icons.confirmation_number, color: Colors.white, size: 30),
+                 const SizedBox(width: 16),
+                 const Expanded(
+                   child: Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                        Text('Buy Day Pass (\$10)', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('Instant access to gym & pool', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                     ],
+                   ),
+                 ),
+                 Container(
+                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                   child: const Text('Buy', style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold)),
+                 )
+              ],
+            ),
+            // Demo Helper: Copy Test Card
+            if (!kIsWeb) 
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: InkWell(
+                onTap: () {
+                  Clipboard.setData(const ClipboardData(text: '4242424242424242'));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Demo Card Copied! Paste in Stripe Sheet.')));
+                },
+                child: const Text(
+                  'Tap to Copy Test Card (Demo)',
+                  style: TextStyle(color: Colors.white54, fontSize: 10, decoration: TextDecoration.underline),
+                ),
+              ),
+            )
+         ],
+       ),
       ),
     );
   }

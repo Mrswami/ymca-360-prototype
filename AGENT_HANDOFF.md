@@ -29,6 +29,10 @@ The project has moved from manual hacking to a professional CI/CD flow.
     - Unit Tests setup (`test/user_model_test.dart`).
     - CI/CD Pipelines established.
     - Web support fixed (`setJavaScriptMode` error resolved).
+4.  **Payments (Hybrid):**
+    - Native Stripe Payment Sheet on Mobile.
+    - Stripe Checkout Redirection on Web.
+    - Cloud Functions for secure intent creation.
 
 ## ⏭️ Next Steps (Backlog)
 - **Refactor State Management:** ✅ Done (Riverpod).

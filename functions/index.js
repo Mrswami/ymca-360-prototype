@@ -47,10 +47,12 @@ exports.createCheckoutSession = functions.https.onCall(async (data, context) => 
   const currency = data.currency || 'usd';
   const successUrl = data.successUrl || 'http://localhost:5000/success'; // Default for local testing
   const cancelUrl = data.cancelUrl || 'http://localhost:5000/cancel';
+  const customerEmail = data.customerEmail || 'member@example.com'; // Pre-fill email for demo
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      customer_email: customerEmail, // AUTOFILL: Pre-fills the email field
       line_items: [{
         price_data: {
           currency: currency,

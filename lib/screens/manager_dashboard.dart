@@ -1,8 +1,36 @@
 
-import 'package:flutter/material.dart';
+import '../services/dev/data_seeder.dart';
+
+// ... (existing imports)
+
+// Inside _ManagerDashboardState build
+              const SizedBox(height: 16),
+              _buildAdminCard(
+                context,
+                icon: Icons.storage,
+                title: 'Seed Database (Demo)',
+                subtitle: 'Generate 20 mock users & transactions',
+                color: Colors.teal,
+                onTap: () async {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Seeding Database...')));
+                  await DataSeeder().seedDatabase();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Done! Refresh lists to see data.'), backgroundColor: Colors.green));
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              _buildMFAToggle(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'admin/user_management_screen.dart';
+import 'admin/transaction_review_screen.dart';
 import '../theme/ymca_theme.dart';
 import '../providers/auth_provider.dart';
 
@@ -65,6 +93,15 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                      }
                   }
                 },
+              ),
+              const SizedBox(height: 16),
+              _buildAdminCard(
+                context,
+                icon: Icons.payments,
+                title: 'Daily Batch',
+                subtitle: 'Live feed of Stripe/POS transactions',
+                color: Colors.green,
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TransactionReviewScreen())),
               ),
               const SizedBox(height: 16),
               _buildMFAToggle(),
