@@ -19,20 +19,20 @@ The project has moved from manual hacking to a professional CI/CD flow.
 3.  **Merge to Master:** Triggers automated deployment to `xmca14.web.app`.
 
 ## ✅ Completed Features
-1.  **Childcare Registration:**
+1.  **Departments & Booking (New!):**
+    - Detailed screens for Aquatics, Annex, Cycling, Yoga, Childcare.
+    - "Trainer Availability" Calendar with mock logic (Green Bubble indicators).
+    - Integrated Stripe Payment ($45/session) for time slot bookings.
+2.  **Manager Dashboard & Demo Tools:**
+    - "Daily Batch" Transaction Feed (Live Stripe/Firestore data).
+    - "Seed Database" button with spam protection (generates 20 mock users/transactions).
+3.  **Childcare Registration:**
     - Integrated `webview_flutter` to bridge users to `ezchildtrack.com`.
     - Includes `ChildcareWebView` screen and Home Screen entry point.
-    - Handles Web vs. Native platform differences (Safe initialization).
-2.  **Manager Analytics:**
-    - Entry point in `ManagerDashboard` to view Firebase Analytics.
-3.  **Infrastructure:**
-    - Unit Tests setup (`test/user_model_test.dart`).
-    - CI/CD Pipelines established.
-    - Web support fixed (`setJavaScriptMode` error resolved).
 4.  **Payments (Hybrid):**
     - Native Stripe Payment Sheet on Mobile.
-    - Stripe Checkout Redirection on Web.
-    - Cloud Functions for secure intent creation.
+    - Stripe Checkout Redirection on Web (with successful "Return to App" flow).
+    - "Shadow Ledger" in Firestore for reporting.
 
 ## ⏭️ Next Steps (Backlog)
 - **Refactor State Management:** ✅ Done (Riverpod).

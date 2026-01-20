@@ -8,7 +8,9 @@ import 'income_verification_screen.dart';
 import 'childcare_web_view.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import '../services/stripe_service.dart';
+import 'department_details_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -44,7 +46,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 20),
 
             // 1.5. Day Pass (Stripe Prototype)
-            _buildDayPassCard(context),
+            _buildDayPassCard(context, ref),
             const SizedBox(height: 20),
 
 
@@ -340,28 +342,46 @@ class HomeScreen extends ConsumerWidget {
   }
 
   Widget _buildServicesSection(BuildContext context) {
-    return Row(
+    // We'll use a Wrap or GridView, but for fixed number of items (5), a Column of Rows is fine.
+    return Column(
       children: [
-        Expanded(
-          child: _buildServiceCard(
-            context,
-            icon: Icons.child_care,
-            title: 'Childcare',
-            color: Colors.pink,
-            onTap: () => _showChildcareRedirectDialog(context),
-          ),
+        Row(
+          children: [
+            Expanded(child: _buildDepartmentCard(context, DepartmentType.aquatics, 'Swim')),
+            const SizedBox(width: 10),
+            Expanded(child: _buildDepartmentCard(context, DepartmentType.childcare, 'Childcare')),
+          ],
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _buildServiceCard(
-            context,
-            icon: Icons.pool,
-            title: 'Swim', // Shortened to fit
-            color: Colors.blue,
-            onTap: () {},
-          ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(child: _buildDepartmentCard(context, DepartmentType.annex, 'The Annex')), // Zumba/Judo
+            const SizedBox(width: 10),
+            Expanded(child: _buildDepartmentCard(context, DepartmentType.cycling, 'Cycling')),
+          ],
+        ),
+        const SizedBox(height: 10),
+         Row(
+          children: [
+            Expanded(child: _buildDepartmentCard(context, DepartmentType.yoga, 'Yoga Studio')), // Upstairs
+            const SizedBox(width: 10),
+            const Spacer(), // Placeholder for even spacing if odd number
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildDepartmentCard(BuildContext context, DepartmentType type, String label) {
+    // Helper access mock data to get icon/color from central source
+    final data = mockDepartments[type]!;
+    
+    return _buildServiceCard(
+            context,
+            icon: data.icon,
+            title: label,
+            color: data.color,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DepartmentDetailsScreen(departmentType: type))),
     );
   }
 
@@ -408,7 +428,7 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
-  Widget _buildDayPassCard(BuildContext context) {
+  Widget _buildDayPassCard(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () async {
         final authState = ref.read(authProvider);

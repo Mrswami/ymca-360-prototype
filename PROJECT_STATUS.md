@@ -20,8 +20,12 @@ We have successfully graduated from the "Prototype" phase to the "Professional E
 
 ## 🗺 Road Map
 ### Phase 1: The "Real World" Test (Current Focus)
-- [ ] **Hardware Test**: Validate Barcode Scanning with physical YMCA scanners.
-- [x] **Payments**: Replace "Mock Stripe" with live Stripe SDK for a $1 transaction test.
+- [x] **Department/Service Pages**: Dedicated screens for Aquatics, Childcare, Annex, Cycling, Yoga.
+- [x] **Private Training Booking**: "Trainer Availability" calendar with slots and Stripe payment integration.
+- [x] **Manager Dashboard**: "Daily Batch" transaction feed and "Seed Database" tool with stability locks.
+- [x] **Payment System**: Hybrid Stripe implementation (Mobile Sheet + Web Redirect) with Firestore "Shadow Ledger".
+- [x] **Childcare Registration**: WebView integration with ezchildtrack.
+- [x] **Stability Hardening**: Implemented robust error handling and logging for critical paths.
 
 ### Phase 2: System Integration
 - [ ] **Daxko Connector**: Build Cloud Functions to sync Member Status from the legacy database.

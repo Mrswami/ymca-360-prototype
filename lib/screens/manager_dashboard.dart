@@ -1,38 +1,11 @@
-
-import '../services/dev/data_seeder.dart';
-
-// ... (existing imports)
-
-// Inside _ManagerDashboardState build
-              const SizedBox(height: 16),
-              _buildAdminCard(
-                context,
-                icon: Icons.storage,
-                title: 'Seed Database (Demo)',
-                subtitle: 'Generate 20 mock users & transactions',
-                color: Colors.teal,
-                onTap: () async {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Seeding Database...')));
-                  await DataSeeder().seedDatabase();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Done! Refresh lists to see data.'), backgroundColor: Colors.green));
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              _buildMFAToggle(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'admin/user_management_screen.dart';
 import 'admin/transaction_review_screen.dart';
 import '../theme/ymca_theme.dart';
 import '../providers/auth_provider.dart';
+import '../services/dev/data_seeder.dart';
 
 class ManagerDashboard extends ConsumerStatefulWidget {
   const ManagerDashboard({super.key});
@@ -42,6 +15,8 @@ class ManagerDashboard extends ConsumerStatefulWidget {
 }
 
 class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
+  bool _isSeeding = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,6 +79,26 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TransactionReviewScreen())),
               ),
               const SizedBox(height: 16),
+              _buildAdminCard(
+                context,
+                icon: Icons.storage,
+                title: 'Seed Database (Demo)',
+                subtitle: 'Generate 20 mock users & transactions',
+                color: Colors.teal,
+                isLoading: _isSeeding,
+                onTap: _isSeeding ? () {} : () async {
+                  setState(() => _isSeeding = true);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Seeding Database...')));
+                  
+                  await DataSeeder().seedDatabase();
+                  
+                  if (context.mounted) {
+                    setState(() => _isSeeding = false);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Done! Refresh lists to see data.'), backgroundColor: Colors.green));
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
               _buildMFAToggle(),
             ],
           ),
@@ -130,7 +125,7 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
     );
   }
 
-  Widget _buildAdminCard(BuildContext context, {required IconData icon, required String title, required String subtitle, required Color color, required VoidCallback onTap}) {
+  Widget _buildAdminCard(BuildContext context, {required IconData icon, required String title, required String subtitle, required Color color, required VoidCallback onTap, bool isLoading = false}) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -143,7 +138,9 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: isLoading 
+          ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: color)) 
+          : const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: onTap,
       ),
     );
