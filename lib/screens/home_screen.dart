@@ -1,16 +1,21 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/ymca_background.dart';
 import '../theme/ymca_theme.dart';
-import '../services/auth_service.dart';
+import '../providers/auth_provider.dart';
 import 'income_verification_screen.dart';
 import 'childcare_web_view.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import '../services/stripe_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasPendingMFA = ref.watch(authProvider).hasPendingMFA;
+
     return Scaffold(
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
@@ -30,12 +35,17 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 80), // Padding for Floating Role Switcher
           children: [
             // 0. URGENT ALERT (Simulated from Daxko)
-            if (AuthService().hasPendingMFA) _buildAlertBanner(context),
-            if (AuthService().hasPendingMFA) const SizedBox(height: 16),
+            if (hasPendingMFA) _buildAlertBanner(context),
+            if (hasPendingMFA) const SizedBox(height: 16),
 
             // 1. Digital ID Card "Quick Access"
             _buildCheckInCard(context),
             const SizedBox(height: 20),
+
+            // 1.5. Day Pass (Stripe Prototype)
+            _buildDayPassCard(context),
+            const SizedBox(height: 20),
+
 
             // 2. Generic Gym Info (Common Sense Feature)
             _buildBranchInfo(context),
@@ -394,6 +404,48 @@ class HomeScreen extends StatelessWidget {
             child: const Text('Proceed'),
           ),
         ],
+      ),
+    );
+  }
+  Widget _buildDayPassCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Initializing Payment...')));
+        final success = await StripeService.instance.makePayment(10.00);
+        if (context.mounted) {
+           if (success) {
+             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Payment Successful! Welcome!'), backgroundColor: Colors.green));
+           } else {
+             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Payment Failed or Cancelled'), backgroundColor: Colors.red));
+           }
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [Colors.purple, Colors.deepPurple]),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+             const Icon(Icons.confirmation_number, color: Colors.white, size: 30),
+             const SizedBox(width: 16),
+             const Expanded(
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                    Text('Buy Day Pass (\$10)', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('Instant access to gym & pool', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                 ],
+               ),
+             ),
+             Container(
+               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+               child: const Text('Buy', style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold)),
+             )
+          ],
+        ),
       ),
     );
   }

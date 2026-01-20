@@ -1,16 +1,18 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/ymca_theme.dart';
 import '../services/auth_service.dart';
+import '../providers/auth_provider.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  final AuthService _auth = AuthService();
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isEditing = false;
 
   // Controllers
@@ -56,7 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final role = _auth.currentRole;
+    final role = ref.watch(authProvider).role;
     String roleLabel = 'Member';
     Color roleColor = AppColors.ymcaBlue;
     
