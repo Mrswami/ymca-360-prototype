@@ -1,17 +1,19 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'admin/user_management_screen.dart';
-import '../services/auth_service.dart';
 import '../theme/ymca_theme.dart';
+import '../providers/auth_provider.dart';
 
-class ManagerDashboard extends StatefulWidget {
+class ManagerDashboard extends ConsumerStatefulWidget {
   const ManagerDashboard({super.key});
 
   @override
-  State<ManagerDashboard> createState() => _ManagerDashboardState();
+  ConsumerState<ManagerDashboard> createState() => _ManagerDashboardState();
 }
 
-class _ManagerDashboardState extends State<ManagerDashboard> {
+class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,19 +113,16 @@ class _ManagerDashboardState extends State<ManagerDashboard> {
   }
 
   Widget _buildMFAToggle() {
-    final authService = AuthService(); // Access singleton
-    // Note: State needs to track this, but AuthService isn't a ChangeNotifier stream here. 
-    // For demo simplicity, we toggle and setState.
+    final hasPendingMFA = ref.watch(authProvider).hasPendingMFA;
+    
     return Card(
       child: SwitchListTile(
         title: const Text('Simulate MFA Trigger'),
         subtitle: const Text('Show "Action Required" on Member Home'),
-        value: authService.hasPendingMFA,
+        value: hasPendingMFA,
         activeColor: Colors.red,
         onChanged: (val) {
-          setState(() {
-            authService.hasPendingMFA = val;
-          });
+          ref.read(authProvider.notifier).toggleMFA(val);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('MFA Alert turned ${val ? "ON" : "OFF"}')));
         },
       ),

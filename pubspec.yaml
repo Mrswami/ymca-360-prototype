@@ -1,4 +1,4 @@
-name: example_app
+name: xmca14_dev
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -44,6 +44,8 @@ dependencies:
   webview_flutter_android: ^3.13.0
   webview_flutter_wkwebview: ^3.13.0
   firebase_analytics: ^12.1.0
+  flutter_riverpod: ^3.2.0
+  firebase_remote_config: ^6.1.4
 
 dev_dependencies:
   flutter_test:

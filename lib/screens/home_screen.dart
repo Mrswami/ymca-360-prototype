@@ -1,16 +1,20 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/ymca_background.dart';
 import '../theme/ymca_theme.dart';
-import '../services/auth_service.dart';
+import '../providers/auth_provider.dart';
 import 'income_verification_screen.dart';
 import 'childcare_web_view.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasPendingMFA = ref.watch(authProvider).hasPendingMFA;
+
     return Scaffold(
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
@@ -30,8 +34,8 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 80), // Padding for Floating Role Switcher
           children: [
             // 0. URGENT ALERT (Simulated from Daxko)
-            if (AuthService().hasPendingMFA) _buildAlertBanner(context),
-            if (AuthService().hasPendingMFA) const SizedBox(height: 16),
+            if (hasPendingMFA) _buildAlertBanner(context),
+            if (hasPendingMFA) const SizedBox(height: 16),
 
             // 1. Digital ID Card "Quick Access"
             _buildCheckInCard(context),

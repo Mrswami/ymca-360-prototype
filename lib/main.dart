@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'services/remote_config/remote_config_service.dart';
 
 import 'theme/ymca_theme.dart';
 import 'services/auth_service.dart';
+import 'providers/auth_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/scheduler_screen.dart';
 import 'screens/workouts_screen.dart';
@@ -11,71 +16,59 @@ import 'screens/manager_dashboard.dart';
 import 'screens/classes_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/community_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // Run `flutterfire configure` to generate this!
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Extract options to variable to prevent const evaluation issues
   final options = DefaultFirebaseOptions.currentPlatform;
   await Firebase.initializeApp(options: options);
-  runApp(const YMCAApp());
+
+  // Initialize Remote Config (Crashlytics would go here too)
+  final container = ProviderContainer();
+  final remoteConfig = container.read(remoteConfigProvider);
+  try {
+    await remoteConfig.initialize();
+  } catch (e) {
+    debugPrint("Remote Config Init Failed: $e");
+  }
+
+  runApp(UncontrolledProviderScope(
+    container: container,
+    child: const YMCAApp(),
+  ));
 }
 
-class YMCAApp extends StatefulWidget {
+class YMCAApp extends ConsumerWidget {
   const YMCAApp({super.key});
 
   @override
-  State<YMCAApp> createState() => _YMCAAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
 
-class _YMCAAppState extends State<YMCAApp> {
-  // Key to force rebuild app on logout
-  Key key = UniqueKey();
-  bool _isLoggedIn = false;
-
-  void restartApp() {
-    setState(() {
-      key = UniqueKey();
-      _isLoggedIn = false;
-    });
-  }
-
-  void _login() {
-    setState(() {
-      _isLoggedIn = true;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return MaterialApp(
-      key: key,
       title: 'YMCA 360',
       theme: ymcaTheme,
-      home: _isLoggedIn 
-          ? MainShell(onRestart: restartApp) 
-          : WelcomeScreen(onLogin: _login),
+      home: authState.isLoggedIn 
+          ? const MainShell() 
+          : WelcomeScreen(
+              onLogin: () => ref.read(authProvider.notifier).loginAsMember('m1'),
+            ),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MainShell extends StatefulWidget {
-  final VoidCallback onRestart;
-  const MainShell({super.key, required this.onRestart});
+class MainShell extends ConsumerStatefulWidget {
+  const MainShell({super.key});
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  ConsumerState<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends ConsumerState<MainShell> {
   int _selectedIndex = 0;
-  final AuthService _auth = AuthService();
 
-  // Screen Lists per Role
-  List<Widget> _getScreens() {
-    switch (_auth.currentRole) {
+  List<Widget> _getScreens(UserRole role, String? userId) {
+    switch (role) {
       case UserRole.member:
         return [
           const HomeScreen(),
@@ -86,22 +79,21 @@ class _MainShellState extends State<MainShell> {
         ];
       case UserRole.trainer:
         return [
-          // Basic Home view but maybe slightly different? For now same home.
-          const HomeScreen(), 
-          TrainerScheduleEditor(trainerId: _auth.currentUserId ?? 't1'),
+          const HomeScreen(),
+          TrainerScheduleEditor(trainerId: userId ?? 't1'),
           const ProfileScreen(),
         ];
       case UserRole.manager:
         return [
-          const ManagerDashboard(), // Dashboard is home for manager
-          const SchedulerScreen(), // To view bookings
+          const ManagerDashboard(),
+          const SchedulerScreen(),
           const ProfileScreen(),
         ];
     }
   }
 
-  List<BottomNavigationBarItem> _getNavItems() {
-    switch (_auth.currentRole) {
+  List<BottomNavigationBarItem> _getNavItems(UserRole role) {
+    switch (role) {
       case UserRole.member:
         return const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -131,8 +123,10 @@ class _MainShellState extends State<MainShell> {
     });
   }
 
-  // Demo functionality to switch roles
   void _showRoleSwitcher() {
+    final authNotifier = ref.read(authProvider.notifier);
+    final hasPendingMFA = ref.read(authProvider).hasPendingMFA;
+
     showModalBottomSheet(
       context: context,
       builder: (ctx) => Column(
@@ -147,8 +141,8 @@ class _MainShellState extends State<MainShell> {
             title: const Text('Member View'),
             subtitle: const Text('James Moreno'),
             onTap: () {
-              _auth.loginAsMember('m1');
-              _reload();
+              authNotifier.loginAsMember('m1');
+              Navigator.pop(context);
             },
           ),
           ListTile(
@@ -156,8 +150,8 @@ class _MainShellState extends State<MainShell> {
             title: const Text('Trainer View'),
             subtitle: const Text('Sarah Connor (Instructor)'),
             onTap: () {
-              _auth.loginAsTrainer('t1');
-              _reload();
+              authNotifier.loginAsTrainer('t1');
+              Navigator.pop(context);
             },
           ),
           ListTile(
@@ -165,19 +159,19 @@ class _MainShellState extends State<MainShell> {
             title: const Text('Manager View'),
             subtitle: const Text('Admin Dashboard'),
             onTap: () {
-              _auth.loginAsManager();
-              _reload();
+              authNotifier.loginAsManager();
+              Navigator.pop(context);
             },
           ),
           const Divider(),
           SwitchListTile(
             title: const Text('Simulate MFA Trigger'),
             subtitle: const Text('Toggle "Action Required" alert'),
-            value: _auth.hasPendingMFA, 
+            value: hasPendingMFA,
             activeColor: AppColors.ymcaBlue,
             onChanged: (val) {
-              _auth.hasPendingMFA = val;
-              _reload();
+              authNotifier.toggleMFA(val);
+              Navigator.pop(context);
             },
           ),
           const SizedBox(height: 20),
@@ -186,17 +180,13 @@ class _MainShellState extends State<MainShell> {
     );
   }
 
-  void _reload() {
-    Navigator.pop(context);
-    widget.onRestart();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final screens = _getScreens();
-    final navItems = _getNavItems();
+    final authState = ref.watch(authProvider);
+    final screens = _getScreens(authState.role, authState.userId);
+    final navItems = _getNavItems(authState.role);
 
-    // Ensure index is valid after switching roles (some roles have fewer tabs)
+    // Ensure index is valid after switching roles
     if (_selectedIndex >= screens.length) {
       _selectedIndex = 0;
     }
@@ -209,7 +199,6 @@ class _MainShellState extends State<MainShell> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
-      // Floating button to switch roles for DEMO purposes
       floatingActionButton: FloatingActionButton(
         mini: true,
         backgroundColor: Colors.black87,
