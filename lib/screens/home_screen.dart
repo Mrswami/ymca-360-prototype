@@ -22,7 +22,7 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
-        title: const Text('YMCA 360'),
+        title: const Text('YMCA 360 - Early Access'),
         backgroundColor: Colors.transparent, // Make transparent to show gradient
         flexibleSpace: Container(
           decoration: const BoxDecoration(
