@@ -23,7 +23,16 @@ class HomeScreen extends ConsumerWidget {
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
         title: const Text('YMCA 360'),
-        backgroundColor: AppColors.ymcaBlue.withOpacity(0.9),
+        backgroundColor: Colors.transparent, // Make transparent to show gradient
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [AppColors.gradientTop, AppColors.gradientBottom],
+            ),
+          ),
+        ),
         elevation: 0,
         actions: [
           IconButton(
@@ -113,11 +122,15 @@ class HomeScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.ymcaBlue,
+          gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [AppColors.gradientTop, AppColors.gradientBottom],
+            ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.ymcaBlue.withOpacity(0.4),
+              color: AppColors.gradientTop.withOpacity(0.4),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

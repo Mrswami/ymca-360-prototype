@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Switched to Blue as requested
-  static const Color ymcaBlue = Color(0xFF0060AF); 
+  // Complementary Opposite Scheme (Inverted Positions)
+  // Original: Purple (Top) -> Blue (Bottom)
+  // Complement: Green -> Orange
+  // Inverted: Orange (Top) -> Green (Bottom)
+  
+  static const Color gradientTop = Color(0xFFFFAB00); // Amber/Orange (Comp of Blue)
+  static const Color gradientBottom = Color(0xFF7CB342); // Light Green (Comp of Purple)
+  
+  static const Color ymcaBlue = gradientTop; // Main Primary Color
   static const Color ymcaBlack = Color(0xFF231F20);
   static const Color ymcaGrey = Color(0xFF6D6E71);
   static const Color background = Color(0xFFF4F4F4);
