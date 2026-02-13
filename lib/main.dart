@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,8 +18,17 @@ import 'screens/classes_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/community_screen.dart';
 
+import 'services/stripe_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Stripe
+  // Initialize Stripe (Mobile Only for now)
+  if (!kIsWeb) {
+    StripeService.instance.init();
+  }
+  
   final options = DefaultFirebaseOptions.currentPlatform;
   await Firebase.initializeApp(options: options);
 
@@ -44,13 +54,26 @@ class YMCAApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
+    if (authState.isLoading) {
+      return MaterialApp(
+        title: 'YMCA 360',
+        theme: ymcaTheme,
+        debugShowCheckedModeBanner: false,
+        home: const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
     return MaterialApp(
       title: 'YMCA 360',
       theme: ymcaTheme,
       home: authState.isLoggedIn 
           ? const MainShell() 
           : WelcomeScreen(
-              onLogin: () => ref.read(authProvider.notifier).loginAsMember('m1'),
+              onLogin: (remember) => ref.read(authProvider.notifier).loginAsMember(rememberMe: remember),
             ),
       debugShowCheckedModeBanner: false,
     );
@@ -141,7 +164,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             title: const Text('Member View'),
             subtitle: const Text('James Moreno'),
             onTap: () {
-              authNotifier.loginAsMember('m1');
+              authNotifier.loginAsMember();
               Navigator.pop(context);
             },
           ),
@@ -150,7 +173,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             title: const Text('Trainer View'),
             subtitle: const Text('Sarah Connor (Instructor)'),
             onTap: () {
-              authNotifier.loginAsTrainer('t1');
+              authNotifier.loginAsTrainer();
               Navigator.pop(context);
             },
           ),

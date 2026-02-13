@@ -4,10 +4,17 @@ import 'home_screen.dart'; // We'll navigate to mainshell actually logic in main
 // Actually we should navigate to a Login Screen or MainShell. 
 // For demo, Log In could just go straight to MainShell.
 
-class WelcomeScreen extends StatelessWidget {
-  final VoidCallback onLogin;
+class WelcomeScreen extends StatefulWidget {
+  final void Function(bool rememberMe) onLogin;
 
   const WelcomeScreen({super.key, required this.onLogin});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool _rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +58,11 @@ class WelcomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
                   Text('YMCA 360', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                  Row(
+                  Stack( // Removed Privacy Links for cleaner mobile look, just show generic
                     children: [
-                      Text('Privacy', style: TextStyle(color: Colors.white, fontSize: 16)),
-                      SizedBox(width: 16),
-                      Text('Terms', style: TextStyle(color: Colors.white, fontSize: 16)),
+                       Text('Beta v1.0', style: TextStyle(color: Colors.white54, fontSize: 12)),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),
@@ -89,29 +94,32 @@ class WelcomeScreen extends StatelessWidget {
                     height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
 
-                // Dots Indicator (Cosmetic)
+                // Remember Me
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(4, (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: index == 0 ? AppColors.ymcaBlue : Colors.grey.shade600,
+                  children: [
+                    Theme(
+                      data: ThemeData(unselectedWidgetColor: Colors.white),
+                      child: Checkbox(
+                        value: _rememberMe,
+                        activeColor: AppColors.ymcaBlue,
+                        checkColor: Colors.white,
+                        onChanged: (val) => setState(() => _rememberMe = val!),
+                      ),
                     ),
-                  )),
+                    const Text('Keep me logged in', style: TextStyle(color: Colors.white)),
+                  ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
 
                 // Buttons
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: onLogin,
+                        onPressed: () => widget.onLogin(_rememberMe),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.ymcaBlue,
                           foregroundColor: Colors.white,
@@ -124,16 +132,17 @@ class WelcomeScreen extends StatelessWidget {
                     const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
-                           // Blank button as requested
-                        },
+                        onPressed: () {},
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.ymcaBlue, // or slightly different shade?
+                          backgroundColor: Colors.white.withOpacity(0.1),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: const BorderSide(color: Colors.white30),
+                          ),
                         ),
-                        child: const Text('Wellness', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: const Text('Wellness', style: TextStyle(fontSize: 18)),
                       ),
                     ),
                   ],
