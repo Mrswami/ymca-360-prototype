@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/ymca_background.dart';
+import '../widgets/pickleball_hub_card.dart';
 import '../theme/ymca_theme.dart';
 import '../providers/auth_provider.dart';
 import 'income_verification_screen.dart';
@@ -56,6 +57,10 @@ class HomeScreen extends ConsumerWidget {
 
             // 1.5. Day Pass (Stripe Prototype)
             _buildDayPassCard(context, ref),
+            const SizedBox(height: 20),
+
+            // 1.8. Pickleball Hub (Strategic Feature)
+            const PickleballHubCard(),
             const SizedBox(height: 20),
 
 
