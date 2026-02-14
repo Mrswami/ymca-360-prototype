@@ -77,3 +77,43 @@ exports.createCheckoutSession = functions.https.onCall(async (data, context) => 
     throw new functions.https.HttpsError('unknown', error.message, error);
   }
 });
+
+/**
+ * Send Push Notification to a topic
+ * Called from the Admin Panel
+ */
+exports.sendNotification = functions.https.onCall(async (data, context) => {
+  // Verify the user is authenticated (optional but recommended)
+  // if (!context.auth) {
+  //   throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  // }
+
+  const { title, body, type, topic } = data;
+
+  // Validation
+  if (!title || !body || !topic) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing required fields: title, body, or topic');
+  }
+
+  // Build notification payload
+  const message = {
+    notification: {
+      title: title,
+      body: body,
+    },
+    data: {
+      type: type || 'general',
+      click_action: 'FLUTTER_NOTIFICATION_CLICK',
+    },
+    topic: topic,
+  };
+
+  try {
+    const response = await admin.messaging().send(message);
+    console.log('Successfully sent notification:', response);
+    return { success: true, messageId: response };
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    throw new functions.https.HttpsError('internal', 'Failed to send notification', error);
+  }
+});

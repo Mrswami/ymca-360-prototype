@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'admin/user_management_screen.dart';
 import 'admin/transaction_review_screen.dart';
+import 'admin/send_notification_screen.dart';
 import '../theme/ymca_theme.dart';
 import '../providers/auth_provider.dart';
 import '../services/dev/data_seeder.dart';
@@ -38,6 +39,15 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                 subtitle: 'View and edit registered members (Firestore)',
                 color: Colors.purple,
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminUsersScreen())),
+              ),
+              const SizedBox(height: 16),
+              _buildAdminCard(
+                context,
+                icon: Icons.notifications_active,
+                title: 'Send Push Notification',
+                subtitle: 'Send announcements to all users',
+                color: Colors.deepOrange,
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SendNotificationScreen())),
               ),
               const SizedBox(height: 16),
               _buildAdminCard(
