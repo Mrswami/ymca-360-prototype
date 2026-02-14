@@ -25,6 +25,26 @@ Go to: `Firebase Console → Authentication → Sign-in method`
 
 ---
 
+## 🔔 Cloud Messaging (Push Notifications)
+
+### Setup
+Go to: `Firebase Console → Cloud Messaging`
+
+- [x] **Cloud Messaging API Enabled**
+  - Status: **ENABLED** (auto-enabled with Firebase)
+  - Why: Allows sending push notifications to users
+  - Date enabled: 2026-02-14
+
+### Server Key (for backend)
+Go to: `Firebase Console → Project Settings → Cloud Messaging → Server key`
+
+- [ ] **Server Key** (Future - for backend notification sending)
+  - Status: Not yet needed (currently using topic-based notifications)
+  - Why: Backend services need this to send targeted notifications
+  - Note: Will be needed when implementing admin "Send Notification" feature
+
+---
+
 ## 🗄️ Firestore Database
 
 ### Database Setup

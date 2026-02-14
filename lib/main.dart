@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'services/remote_config/remote_config_service.dart';
+import 'services/notification_service.dart';
 
 import 'theme/ymca_theme.dart';
 import 'services/auth_service.dart';
@@ -23,16 +25,22 @@ import 'services/stripe_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Stripe
+  // Initialize Firebase
+  final options = DefaultFirebaseOptions.currentPlatform;
+  await Firebase.initializeApp(options: options);
+
+  // Register FCM background handler
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   // Initialize Stripe (Mobile Only for now)
   if (!kIsWeb) {
     StripeService.instance.init();
   }
-  
-  final options = DefaultFirebaseOptions.currentPlatform;
-  await Firebase.initializeApp(options: options);
 
-  // Initialize Remote Config (Crashlytics would go here too)
+  // Initialize Notifications (Local + FCM)
+  await NotificationService.init();
+
+  // Initialize Remote Config
   final container = ProviderContainer();
   final remoteConfig = container.read(remoteConfigProvider);
   try {
