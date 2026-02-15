@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
+import '../services/user_service.dart';
 
 class AuthState {
   final bool isLoggedIn;
@@ -91,11 +92,17 @@ class AuthNotifier extends Notifier<AuthState> {
     try {
       state = state.copyWith(isLoading: true);
       
-      // 1. Authenticate anonymously
+      // 1. Authenticate anonymously (or standard sign-in later)
       final userCredential = await FirebaseAuth.instance.signInAnonymously();
-      final uid = userCredential.user!.uid;
+      final user = userCredential.user!;
+      final uid = user.uid;
 
-      // 2. Update State
+      // 2. Sync with Backend (Firestore)
+      // This solves the 'backend for multiple users' request.
+      // We persist their preferences, DUPR ID, etc.
+      await UserService().syncUser(user, role);
+
+      // 3. Update State
       state = state.copyWith(
         isLoggedIn: true,
         role: role,
@@ -103,9 +110,7 @@ class AuthNotifier extends Notifier<AuthState> {
         isLoading: false,
       );
 
-      // 3. Persist "Session Intent" and Role
-      // We rely on Firebase SDK to persist the Auth Token securely.
-      // We just store our app-specific "Role" and the "Remember Me" preference.
+      // 4. Persist "Session Intent" locally
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', rememberMe);
       await prefs.setString('role', role.name); 
