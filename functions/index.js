@@ -1,6 +1,17 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const stripe = require("stripe")(functions.config().stripe.secret);
+
+let stripe;
+try {
+  // Check if stripe config exists before requiring
+  if (functions.config().stripe && functions.config().stripe.secret) {
+    stripe = require("stripe")(functions.config().stripe.secret);
+  } else {
+    console.warn("Stripe config missing (functions.config().stripe.secret). Payments disabled.");
+  }
+} catch (e) {
+  console.warn("Error initializing Stripe:", e);
+}
 
 admin.initializeApp();
 
@@ -24,6 +35,10 @@ exports.createPaymentIntent = functions.https.onCall(async (data, context) => {
   }
 
   // 2. Create Intent
+  if (!stripe) {
+    throw new functions.https.HttpsError('failed-precondition', 'Stripe payments are not configured on the server.');
+  }
+
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
@@ -48,6 +63,10 @@ exports.createCheckoutSession = functions.https.onCall(async (data, context) => 
   const successUrl = data.successUrl || 'http://localhost:5000/success'; // Default for local testing
   const cancelUrl = data.cancelUrl || 'http://localhost:5000/cancel';
   const customerEmail = data.customerEmail || 'member@example.com'; // Pre-fill email for demo
+
+  if (!stripe) {
+    throw new functions.https.HttpsError('failed-precondition', 'Stripe payments are not configured on the server.');
+  }
 
   try {
     const session = await stripe.checkout.sessions.create({
