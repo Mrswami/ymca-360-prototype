@@ -97,10 +97,16 @@ class AuthNotifier extends Notifier<AuthState> {
       final user = userCredential.user!;
       final uid = user.uid;
 
-      // 2. Sync with Backend (Firestore)
-      // This solves the 'backend for multiple users' request.
-      // We persist their preferences, DUPR ID, etc.
-      await UserService().syncUser(user, role);
+      // 2. Sync with Backend (Firestore) with a safety timeout
+      try {
+        await UserService().syncUser(user, role).timeout(
+          const Duration(seconds: 3),
+          onTimeout: () => print("Firestore sync timed out, proceeding anyway."),
+        );
+      } catch (e) {
+        print("Firestore sync failed: $e");
+        // We catch here so the user isn't stuck if Firestore fails
+      }
 
       // 3. Update State
       state = state.copyWith(

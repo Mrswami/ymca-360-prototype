@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const functions = require("firebase-functions"); // Redeploy trigger v2
 const admin = require("firebase-admin");
 
 let stripe;
