@@ -1,48 +1,80 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Complementary Opposite Scheme (Inverted Positions)
-  // Original: Purple (Top) -> Blue (Bottom)
-  // Complement: Green -> Orange
-  // Inverted: Orange (Top) -> Green (Bottom)
-  
-  static const Color gradientTop = Color(0xFFFFAB00); // Amber/Orange (Comp of Blue)
-  static const Color gradientBottom = Color(0xFF7CB342); // Light Green (Comp of Purple)
-  
-  static const Color ymcaBlue = gradientTop; // Main Primary Color
-  static const Color ymcaBlack = Color(0xFF231F20);
-  static const Color ymcaGrey = Color(0xFF6D6E71);
-  static const Color background = Color(0xFFF4F4F4);
-  static const Color cardSurface = Colors.white;
+  // Official YMCA 360 Dark Purple Theme
+  static const Color ymcaPurple      = Color(0xFF5B21B6); // Primary purple (buttons, accents)
+  static const Color ymcaPurpleLight = Color(0xFF7C3AED); // Lighter purple (highlights)
+  static const Color ymcaPurpleDark  = Color(0xFF3B0764); // Splash gradient bottom
+  static const Color darkBackground  = Color(0xFF0A0A0A); // Main scaffold background (near-black)
+  static const Color cardDark        = Color(0xFF1A1A1A); // Card surfaces
+  static const Color cardDarkAlt     = Color(0xFF252525); // Slightly lighter card
+  static const Color textPrimary     = Color(0xFFFFFFFF); // Primary text
+  static const Color textSecondary   = Color(0xFFB0B0B0); // Secondary / subtext
+  static const Color divider         = Color(0xFF2E2E2E); // Dividers
+
+  // Legacy aliases (so existing screens don't break immediately)
+  static const Color ymcaBlue        = ymcaPurple;
+  static const Color gradientTop     = ymcaPurpleLight;
+  static const Color gradientBottom  = ymcaPurpleDark;
+  static const Color ymcaBlack       = Color(0xFF231F20);
+  static const Color ymcaGrey        = Color(0xFF6D6E71);
+  static const Color background      = darkBackground;
+  static const Color cardSurface     = cardDark;
 }
 
 final ThemeData ymcaTheme = ThemeData(
-  primaryColor: AppColors.ymcaBlue,
-  scaffoldBackgroundColor: AppColors.background,
-  colorScheme: ColorScheme.fromSwatch().copyWith(
-    primary: AppColors.ymcaBlue,
-    secondary: AppColors.ymcaBlack,
-    surface: AppColors.cardSurface,
+  brightness: Brightness.dark,
+  primaryColor: AppColors.ymcaPurple,
+  scaffoldBackgroundColor: AppColors.darkBackground,
+
+  colorScheme: const ColorScheme.dark(
+    primary:   AppColors.ymcaPurple,
+    secondary: AppColors.ymcaPurpleLight,
+    surface:   AppColors.cardDark,
+    onPrimary: Colors.white,
+    onSurface: AppColors.textPrimary,
   ),
+
   appBarTheme: const AppBarTheme(
-    backgroundColor: AppColors.ymcaBlue,
-    foregroundColor: Colors.white,
+    backgroundColor: AppColors.darkBackground,
+    foregroundColor: AppColors.textPrimary,
     elevation: 0,
-    centerTitle: true,
+    centerTitle: false,
+    iconTheme: IconThemeData(color: AppColors.textPrimary),
   ),
+
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-    backgroundColor: Colors.white,
-    selectedItemColor: AppColors.ymcaBlue,
-    unselectedItemColor: AppColors.ymcaGrey,
+    backgroundColor: Color(0xFF121212),
+    selectedItemColor: AppColors.ymcaPurple,
+    unselectedItemColor: AppColors.textSecondary,
+    selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+    unselectedLabelStyle: TextStyle(fontSize: 11),
+    type: BottomNavigationBarType.fixed,
   ),
+
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: AppColors.ymcaBlue,
+      backgroundColor: AppColors.ymcaPurple,
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
     ),
   ),
-  fontFamily: 'Roboto', 
+
+  textTheme: const TextTheme(
+    displayLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+    titleLarge:   TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 20),
+    titleMedium:  TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 16),
+    bodyLarge:    TextStyle(color: AppColors.textPrimary, fontSize: 15),
+    bodyMedium:   TextStyle(color: AppColors.textSecondary, fontSize: 13),
+    labelSmall:   TextStyle(color: AppColors.textSecondary, fontSize: 11),
+  ),
+
+  dividerTheme: const DividerThemeData(
+    color: AppColors.divider,
+    thickness: 1,
+  ),
+
+  fontFamily: 'Roboto',
 );

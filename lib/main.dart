@@ -19,6 +19,9 @@ import 'screens/manager_dashboard.dart';
 import 'screens/classes_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/community_screen.dart';
+import 'screens/my_y_screen.dart';
+import 'screens/barcode_screen.dart';
+import 'screens/splash_screen.dart';
 
 import 'services/stripe_service.dart';
 
@@ -67,11 +70,7 @@ class YMCAApp extends ConsumerWidget {
         title: 'YMCA 360',
         theme: ymcaTheme,
         debugShowCheckedModeBanner: false,
-        home: const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
+        home: const SplashScreen(),
       );
     }
 
@@ -103,21 +102,22 @@ class _MainShellState extends ConsumerState<MainShell> {
       case UserRole.member:
         return [
           const HomeScreen(),
-          const SchedulerScreen(),
-          const ClassesScreen(),
-          const CommunityScreen(),
-          const ProfileScreen(),
+          const WorkoutsScreen(),   // Watch tab
+          const MyYScreen(),        // My Y tab
+          const SchedulerScreen(),  // Activity tab
+          const CommunityScreen(),  // Connect tab
         ];
       case UserRole.trainer:
         return [
           const HomeScreen(),
           TrainerScheduleEditor(trainerId: userId ?? 't1'),
+          const MyYScreen(),
           const ProfileScreen(),
         ];
       case UserRole.manager:
         return [
           const ManagerDashboard(),
-          const SchedulerScreen(),
+          const MyYScreen(),
           const ProfileScreen(),
         ];
     }
@@ -127,23 +127,24 @@ class _MainShellState extends ConsumerState<MainShell> {
     switch (role) {
       case UserRole.member:
         return const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Book PT'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_view_week), label: 'Classes'),
-          BottomNavigationBarItem(icon: Icon(Icons.groups), label: 'Community'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.play_circle_outline_rounded), label: 'Watch'),
+          BottomNavigationBarItem(icon: Icon(Icons.account_balance_rounded), label: 'My Y'),
+          BottomNavigationBarItem(icon: Icon(Icons.show_chart_rounded), label: 'Activity'),
+          BottomNavigationBarItem(icon: Icon(Icons.share_rounded), label: 'Connect'),
         ];
       case UserRole.trainer:
         return const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'My Schedule'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'My Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.schedule_rounded), label: 'Schedule'),
+          BottomNavigationBarItem(icon: Icon(Icons.account_balance_rounded), label: 'My Y'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profile'),
         ];
       case UserRole.manager:
         return const [
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Members'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: 'Schedule'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Admin'),
+          BottomNavigationBarItem(icon: Icon(Icons.people_alt_rounded), label: 'Dashboard'),
+          BottomNavigationBarItem(icon: Icon(Icons.account_balance_rounded), label: 'My Y'),
+          BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings_rounded), label: 'Admin'),
         ];
     }
   }
