@@ -6,6 +6,8 @@ import '../screens/barcode_screen.dart';
 import '../screens/pickleball_screen.dart';
 import '../screens/income_verification_screen.dart';
 import '../services/stripe_service.dart';
+import 'schedules_screen.dart';
+import 'messages_screen.dart';
 import '../widgets/pickleball_hub_card.dart';
 import 'department_details_screen.dart';
 
@@ -88,7 +90,11 @@ class HomeScreen extends ConsumerWidget {
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => const BarcodeScreen())),
         ),
-        IconButton(icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white), onPressed: () {}),
+        IconButton(
+          icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white),
+          tooltip: 'Messages',
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MessagesScreen())),
+        ),
         IconButton(icon: const Icon(Icons.search_rounded, color: Colors.white), onPressed: () {}),
         IconButton(icon: const Icon(Icons.menu_rounded, color: Colors.white), onPressed: () {}),
       ],
@@ -248,7 +254,7 @@ class HomeScreen extends ConsumerWidget {
               context,
               icon: Icons.calendar_today_rounded,
               label: 'My Schedule',
-              onTap: () {},
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchedulesScreen())),
             )),
             const SizedBox(width: 10),
             Expanded(child: _actionTile(

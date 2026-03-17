@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/ymca_theme.dart';
+import 'schedules_screen.dart';
 
 /// My Y screen — matches the official YMCA 360 "My Y" tab showing branch info,
 /// hours, directions, and action buttons.
@@ -97,14 +98,29 @@ class _MyYScreenState extends State<MyYScreen> {
                 Expanded(child: _buildPurpleActionButton(
                   icon: Icons.calendar_month_rounded,
                   label: 'Schedules',
-                  onTap: () {},
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchedulesScreen())),
                 )),
                 const SizedBox(width: 12),
                 Expanded(child: _buildPurpleActionButton(
                   icon: Icons.assignment_rounded,
-                  label: 'Register for Programs',
+                  label: 'Register for\nPrograms',
+                  onTap: () => _launchUrl('https://www.austinymca.org/programs'),
+                )),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+            
+            // Second row for Quick Links
+            Row(
+              children: [
+                Expanded(child: _buildPurpleActionButton(
+                  icon: Icons.open_in_new_rounded,
+                  label: 'Quick Links',
                   onTap: () {},
                 )),
+                const SizedBox(width: 12),
+                const Expanded(child: SizedBox()), // Empty space to keep grid alignment
               ],
             ),
 
@@ -237,30 +253,73 @@ class _MyYScreenState extends State<MyYScreen> {
   void _showBranchSwitcher() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.cardDark,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text('Select Your Y', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-          ),
-          _branchTile('TownLake YMCA', '1100 W Cesar Chavez · 0.03 mi', true),
-          _branchTile('Southwest YMCA', '6219 Manchaca Rd · 7.2 mi', false),
-          _branchTile('North Austin YMCA', '1000 W Rundberg Ln · 10.1 mi', false),
-          const SizedBox(height: 20),
-        ],
+      isScrollControlled: true,
+      backgroundColor: Colors.black, // Dark background
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(0))),
+      builder: (_) => Container(
+        height: MediaQuery.of(context).size.height * 0.9,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Select a New Branch', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                    onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(color: AppColors.divider, height: 1),
+            
+            // Current Branch Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: const Text('CURRENT BRANCH', style: TextStyle(color: Color(0xFFE5A845), fontSize: 13, fontWeight: FontWeight.bold)),
+            ),
+            _buildDetailedBranchTile('TownLake YMCA', '1100 West Cesar Chavez\nAustin, TX, 78703\n512-542-9622', isCurrent: true),
+            
+            // Other Branches
+            _buildDetailedBranchTile('Southwest YMCA', '6219 Oakclaire Dr.\nAustin, TX, 78735\n512-891-9622'),
+            _buildDetailedBranchTile('Springs Family YMCA', '27216 Ranch Rd 12\nDripping Springs, TX, 78620\n512-894-3309'),
+            _buildDetailedBranchTile('Hays Communities YMCA', '465 Buda Sportsplex Dr\nBuda, TX, 78610\n512-523-0099'),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _branchTile(String name, String detail, bool selected) {
-    return ListTile(
-      title: Text(name, style: const TextStyle(color: Colors.white)),
-      subtitle: Text(detail, style: const TextStyle(color: AppColors.textSecondary)),
-      trailing: selected ? const Icon(Icons.check_circle_rounded, color: AppColors.ymcaPurple) : null,
+  Widget _buildDetailedBranchTile(String name, String detail, {bool isCurrent = false}) {
+    return InkWell(
       onTap: () => Navigator.pop(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: AppColors.divider)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text(detail, style: const TextStyle(color: AppColors.textSecondary, fontSize: 15, height: 1.4)),
+          ],
+        ),
+      ),
     );
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not open $url')));
+    }
   }
 }
