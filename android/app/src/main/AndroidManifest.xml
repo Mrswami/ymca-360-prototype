@@ -68,5 +68,4 @@
             <data android:mimeType="*/*" />
         </intent>
     </queries>
-    </queries>
 </manifest>
