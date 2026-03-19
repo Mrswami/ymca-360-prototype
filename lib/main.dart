@@ -67,7 +67,7 @@ class YMCAApp extends ConsumerWidget {
 
     if (authState.isLoading) {
       return MaterialApp(
-        title: 'YMCA 360',
+        title: 'YMCA Prototype',
         theme: ymcaTheme,
         debugShowCheckedModeBanner: false,
         home: const SplashScreen(),
@@ -75,7 +75,7 @@ class YMCAApp extends ConsumerWidget {
     }
 
     return MaterialApp(
-      title: 'YMCA 360',
+      title: 'YMCA Prototype',
       theme: ymcaTheme,
       home: authState.isLoggedIn 
           ? const MainShell() 

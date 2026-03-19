@@ -1,23 +1,34 @@
 {
     "workbench.colorCustomizations": {
-        "activityBar.activeBackground": "#f93e95",
-        "activityBar.background": "#f93e95",
-        "activityBar.foreground": "#e7e7e7",
-        "activityBar.inactiveForeground": "#e7e7e799",
-        "activityBarBadge.background": "#2d5d03",
+        "activityBar.activeBackground": "#57ce3f",
+        "activityBar.background": "#57ce3f",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#4d63d2",
         "activityBarBadge.foreground": "#e7e7e7",
         "commandCenter.border": "#e7e7e799",
-        "sash.hoverBorder": "#f93e95",
-        "statusBar.background": "#f70d7a",
+        "sash.hoverBorder": "#57ce3f",
+        "statusBar.background": "#42ae2c",
         "statusBar.foreground": "#e7e7e7",
-        "statusBarItem.hoverBackground": "#f93e95",
-        "statusBarItem.remoteBackground": "#f70d7a",
+        "statusBarItem.hoverBackground": "#57ce3f",
+        "statusBarItem.remoteBackground": "#42ae2c",
         "statusBarItem.remoteForeground": "#e7e7e7",
-        "titleBar.activeBackground": "#f70d7a",
+        "titleBar.activeBackground": "#42ae2c",
         "titleBar.activeForeground": "#e7e7e7",
-        "titleBar.inactiveBackground": "#f70d7a99",
+        "titleBar.inactiveBackground": "#42ae2c99",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#f70d7a",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "peacock.color": "#42ae2c",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build": true
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
+    },
+    "cmake.sourceDirectory": "C:/Cursor Projects/xmca14-dev/linux"
 }
