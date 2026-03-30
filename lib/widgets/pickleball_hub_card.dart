@@ -18,7 +18,7 @@ class PickleballHubCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             gradient: LinearGradient(
-              colors: [Colors.green.shade800, Colors.green.shade600],
+              colors: [AppColors.ymcaGreen, const Color(0xFF5A7B25)], // Deepen the green for gradient
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

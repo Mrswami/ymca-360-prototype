@@ -18,9 +18,7 @@ class PickleballService {
     // The app no longer "presents" fake data; it "requests" real data.
     
     try {
-      // Point to localhost for the Demo to show the IT team
-      _functions.useFunctionsEmulator('localhost', 5001);
-      
+      // Calling deployed cloud function
       final HttpsCallable callable = _functions.httpsCallable('getPickleballProfile');
       final results = await callable.call(<String, dynamic>{
         'playerId': 'DUPR-88219',

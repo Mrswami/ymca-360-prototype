@@ -37,10 +37,10 @@ class PickleballScreen extends ConsumerWidget {
 
             // Quick Actions
             const Text(
-              "Quick Actions",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              "QUICK ACTIONS",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: AppColors.textSecondary),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -48,7 +48,7 @@ class PickleballScreen extends ConsumerWidget {
                     context,
                     icon: Icons.calendar_today,
                     label: "Book Court",
-                    color: Colors.green,
+                    color: AppColors.ymcaGreen,
                     onTap: () => _launchPickleballDen(),
                   ),
                 ),
@@ -58,7 +58,7 @@ class PickleballScreen extends ConsumerWidget {
                     context,
                     icon: Icons.emoji_events,
                     label: "Tournaments",
-                    color: Colors.orange,
+                    color: AppColors.ymcaOrange,
                     onTap: () {}, // TODO: Navigate to tournament list
                   ),
                 ),
@@ -66,15 +66,103 @@ class PickleballScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
 
+            // Live Court Status
+            const Text(
+              "LIVE FACILITY STATUS",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            _buildLiveStatusCard(),
+            const SizedBox(height: 24),
+
             // Upcoming Events List
             const Text(
-              "Upcoming Events",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              "UPCOMING OPEN PLAY & LEAGUES",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: AppColors.textSecondary),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             _buildEventsList(eventsAsync),
+            const SizedBox(height: 24),
+
+            // Leaderboard Snippet
+            const Text(
+              "TOWNLAKE TOP 3 (DUPR)",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            _buildLeaderboardSnippet(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildLiveStatusCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.cardDarkAlt,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.ymcaGreen.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.ymcaGreen.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.check_circle_outline, color: AppColors.ymcaGreen, size: 28),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Open Play Active", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text("3 of 6 Courts Available • Closes at 9 PM", style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeaderboardSnippet() {
+    final players = [
+      {"name": "Sarah Connor", "rating": "4.85"},
+      {"name": "James Moreno", "rating": "4.12"},
+      {"name": "Alex Vance", "rating": "3.90"},
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.cardDarkAlt,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Column(
+        children: players.asMap().entries.map((entry) {
+          int idx = entry.key;
+          var p = entry.value;
+          return Column(
+            children: [
+              ListTile(
+                leading: Text("#${idx + 1}", style: TextStyle(color: idx == 0 ? AppColors.ymcaOrange : Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                title: Text(p["name"]!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(color: AppColors.ymcaNavy, borderRadius: BorderRadius.circular(12)),
+                  child: Text(p["rating"]!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ),
+              if (idx < players.length - 1)
+                const Divider(color: Colors.white10, height: 1),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
@@ -88,7 +176,7 @@ class PickleballScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [Colors.blue.shade900, Colors.blue.shade700],
+            colors: [AppColors.ymcaNavy, const Color(0xFF003D6E)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -183,22 +271,29 @@ class PickleballScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          color: AppColors.cardDarkAlt,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white10),
           boxShadow: [
              BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 5,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 28, color: color),
+            ),
+            const SizedBox(height: 12),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
           ],
         ),
       ),
@@ -210,15 +305,18 @@ class PickleballScreen extends ConsumerWidget {
       data: (events) => Column(
         children: events.map<Widget>((event) => Card(
           elevation: 2,
-          margin: const EdgeInsets.only(bottom: 10),
+          margin: const EdgeInsets.only(bottom: 12),
+          color: AppColors.cardDarkAlt,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ListTile(
-            leading: const CircleAvatar(
-              backgroundColor: Colors.orange,
-              child: Icon(Icons.sports_tennis, color: Colors.white),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            leading: CircleAvatar(
+              backgroundColor: AppColors.ymcaOrange.withOpacity(0.1),
+              child: const Icon(Icons.sports_tennis, color: AppColors.ymcaOrange),
             ),
-            title: Text(event),
-            subtitle: const Text("YMCA Main Complex"),
-            trailing: const Icon(Icons.chevron_right),
+            title: Text(event, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+            subtitle: const Text("YMCA Main Complex", style: TextStyle(color: AppColors.textSecondary)),
+            trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
           ),
         )).toList(),
       ),
