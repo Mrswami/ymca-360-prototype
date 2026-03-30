@@ -1,39 +1,96 @@
-# YMCA: Elevating Community Management
+# YMCA 360 — Prototype
 
-The YMCA system is more than just a scheduling tool; it is the digital foundation for managing community operations. This application aims to centralize administrative tasks, member engagement, and facility coordination into a single, cohesive interface.
-
-## The Motif
-**Community Rhythm.**
-Managing a community space requires balancing staff schedules, member programs, and facility availability. This project moves away from fragmented, paper-based operations toward a synchronized operational rhythm, ensuring that the staff can focus on the members, not the paperwork.
+> A Flutter-based, production-hardened prototype that re-imagines YMCA member engagement through a unified mobile platform. Built to demonstrate enterprise-grade architecture while remaining visually distinct from the official YMCA 360 application.
 
 ---
 
-## Project Structure
+## What This Is
 
-This is a Flutter-based cross-platform application intended to serve as the daily operational dashboard. 
+This is an **unofficial prototype** — not affiliated with or endorsed by the YMCA or its official technology vendors. It exists to:
 
-- **Cross-Platform Delivery:** Built to run consistently across mobile devices for on-the-floor staff and desktop environments for administrators.
-- **Scalable Architecture:** The internal routing and state management are designed to easily expand as the YMCA introduces new programs or requires deeper integrations.
+1. **Demonstrate** a modern, scalable alternative to the current operational tooling
+2. **Prototype** member-facing features (booking, payments, notifications) at production quality
+3. **Propose** a technical architecture capable of integrating with legacy systems (Daxko)
 
-## Development Pipeline
+> The app intentionally uses an **Inverted Orange & Green color scheme** to distinguish it from the official YMCA 360 purple branding.
 
-*This project is currently in the active structuring phase.*
+---
 
-### Initializing the Environment
-Ensure your Flutter SDK is up to date, then prepare the local environment:
+## Feature Status
+
+| Feature | Status |
+|---|---|
+| Multi-Role Auth (Member / Trainer / Manager) | ✅ Live |
+| Hybrid Stripe Payments (Mobile Sheet + Web Checkout) | ✅ Live |
+| Firebase Cloud Functions (Node 20) | ✅ Deployed |
+| Push Notifications via FCM | ✅ Live |
+| Admin Notification Broadcast Panel | ✅ Live |
+| Department Pages (Aquatics, Childcare, Cycling, Yoga) | ✅ Live |
+| Trainer Booking Calendar with Stripe | ✅ Live |
+| Manager Dashboard (Transactions, User Mgmt, Seeder) | ✅ Live |
+| Pickleball Integration (DUPR Profile, Booking) | 🚧 In Progress |
+| Daxko Member Sync (Cloud Function Connector) | 📋 Planned |
+| Beta Deployment (TestFlight / Play Console) | 📋 Planned |
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Flutter SDK (stable channel)
+- Firebase CLI (`npm install -g firebase-tools`)
+- A Firebase project with Firestore, FCM, and Functions enabled
+
+### Setup
 
 ```bash
+# Install Flutter dependencies
 flutter pub get
+
+# Run for web (dev)
+flutter run -d chrome --dart-define=STRIPE_PK=pk_test_YOUR_KEY_HERE
+
+# Run for Android
+flutter run -d android --dart-define=STRIPE_PK=pk_test_YOUR_KEY_HERE
 ```
 
-### Active Targets
-To review the current layout and logic state:
+> **Note:** `firebase_options.dart` is excluded from version control. Run `flutterfire configure` to generate it for your Firebase project.
+
+### Firebase Functions
 
 ```bash
-flutter run -d chrome
-# or 
-flutter run -d ios
+cd functions
+npm install
+firebase deploy --only functions
 ```
 
 ---
-*Built to streamline the operational complexities of community-focused organizations.*
+
+## Security Notes
+
+- **No secrets are committed** — Stripe keys are injected via `--dart-define` at build time.
+- **`firebase_options.dart`** is gitignored — you must run `flutterfire configure` locally.
+- **Firebase Security Rules** are the primary protection layer for Firestore data (key exposure is expected behavior for Firebase Web API keys).
+- **Stripe Secret Key** is stored in Firebase Functions environment config, never in app code.
+
+---
+
+## Architecture
+
+```
+lib/
+├── main.dart           # App entry, Firebase init, role-based routing
+├── theme/              # Inverted Orange & Green design system
+├── screens/            # Feature screens (home, scheduler, admin/)
+├── services/           # Stripe, Notifications, Auth, Remote Config
+├── providers/          # Riverpod state providers
+├── models/             # Data models
+└── widgets/            # Shared UI components
+
+functions/
+└── index.js            # Cloud Functions: Stripe, FCM Notifications, Pickleball
+```
+
+---
+
+*Built to demonstrate what community-focused operations can look like when modern software engineering meets institutional fitness.*

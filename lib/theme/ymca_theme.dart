@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Official YMCA 360 Dark Purple Theme
-  static const Color ymcaPurple      = Color(0xFF5B21B6); // Primary purple (buttons, accents)
-  static const Color ymcaPurpleLight = Color(0xFF7C3AED); // Lighter purple (highlights)
-  static const Color ymcaPurpleDark  = Color(0xFF3B0764); // Splash gradient bottom
-  static const Color darkBackground  = Color(0xFF0A0A0A); // Main scaffold background (near-black)
+  // Inverted Orange & Green Theme (to distinguish from Official Purple)
+  static const Color ymcaOrange      = Color(0xFFF37021); // Primary Orange (buttons, accents)
+  static const Color ymcaGreen       = Color(0xFF8BB63A); // Secondary Green (highlights)
+  static const Color ymcaNavy        = Color(0xFF005596); // Contrast Navy
+  static const Color darkBackground  = Color(0xFF0A0A0A); // Main scaffold background
   static const Color cardDark        = Color(0xFF1A1A1A); // Card surfaces
   static const Color cardDarkAlt     = Color(0xFF252525); // Slightly lighter card
   static const Color textPrimary     = Color(0xFFFFFFFF); // Primary text
   static const Color textSecondary   = Color(0xFFB0B0B0); // Secondary / subtext
   static const Color divider         = Color(0xFF2E2E2E); // Dividers
 
-  // Legacy aliases (so existing screens don't break immediately)
-  static const Color ymcaBlue        = ymcaPurple;
-  static const Color gradientTop     = ymcaPurpleLight;
+  // Legacy aliases adjusted for the new scheme
+  static const Color ymcaBlue        = ymcaNavy; // Now pointing to Navy
+  static const Color ymcaPurple      = ymcaOrange; // Map old Purple to Orange
+  static const Color ymcaPurpleLight = ymcaGreen;  // Map old Lite Purple to Green
+  static const Color ymcaPurpleDark  = Color(0xFFC35A1A); // Dark Orange for gradients
+  
+  static const Color gradientTop     = ymcaOrange;
   static const Color gradientBottom  = ymcaPurpleDark;
+  
   static const Color ymcaBlack       = Color(0xFF231F20);
   static const Color ymcaGrey        = Color(0xFF6D6E71);
   static const Color background      = darkBackground;

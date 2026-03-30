@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import '../../theme/ymca_theme.dart';
+import '../../services/notification_service.dart';
 
 class SendNotificationScreen extends StatefulWidget {
   const SendNotificationScreen({super.key});
@@ -98,169 +99,210 @@ class _SendNotificationScreenState extends State<SendNotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
         title: const Text('Send Push Notification'),
-        backgroundColor: AppColors.ymcaBlue,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Preview Card
-              Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+              // 📱 System-Style Notification Preview
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('PREVIEW', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: AppColors.textSecondary)),
+                  TextButton.icon(
+                    onPressed: () {
+                       NotificationService.showBookingConfirmation(
+                        _titleController.text.isEmpty ? 'Test Notification' : _titleController.text, 
+                        DateTime.now()
+                       );
+                    },
+                    icon: const Icon(Icons.flash_on, size: 14, color: AppColors.ymcaGreen),
+                    label: const Text('Local Test', style: TextStyle(fontSize: 11, color: AppColors.ymcaGreen)),
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardDark,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white10),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.ymcaOrange.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(_notificationTypes[_selectedType], color: AppColors.ymcaOrange, size: 24),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(_notificationTypes[_selectedType], color: AppColors.ymcaBlue),
-                          const SizedBox(width: 8),
-                          const Text('Preview', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _titleController.text.isEmpty ? 'Notification Title' : _titleController.text,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
+                              const Text('now', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _bodyController.text.isEmpty ? 'The message you type below will appear here in the system tray.' : _bodyController.text,
+                            style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
-                      const Divider(),
-                      Text(
-                        _titleController.text.isEmpty ? 'Notification Title' : _titleController.text,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // Notification Type Toggle
+              const Text('SYSTEM TYPE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: AppColors.textSecondary)),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 44,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: _notificationTypes.keys.map((type) {
+                    final isSelected = _selectedType == type;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(_notificationTypeLabels[type]!),
+                        selected: isSelected,
+                        onSelected: (val) => setState(() => _selectedType = type),
+                        selectedColor: AppColors.ymcaOrange.withOpacity(0.2),
+                        backgroundColor: AppColors.cardDark,
+                        labelStyle: TextStyle(color: isSelected ? AppColors.ymcaOrange : Colors.white, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: isSelected ? AppColors.ymcaOrange : Colors.white12)),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _bodyController.text.isEmpty ? 'Notification message will appear here...' : _bodyController.text,
-                        style: const TextStyle(fontSize: 14, color: Colors.black87),
-                      ),
-                    ],
-                  ),
+                    );
+                  }).toList(),
                 ),
               ),
               const SizedBox(height: 24),
 
-              // Notification Type
-              const Text('Notification Type', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                value: _selectedType,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  prefixIcon: Icon(_notificationTypes[_selectedType]),
-                ),
-                items: _notificationTypes.keys.map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(_notificationTypeLabels[type]!),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() => _selectedType = value!),
-              ),
-              const SizedBox(height: 16),
-
               // Title
-              const Text('Title', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
               TextFormField(
                 controller: _titleController,
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'e.g., Pool Closed Tomorrow',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  prefixIcon: const Icon(Icons.title),
+                  labelText: 'Title',
+                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                  hintText: 'e.g., Facility Alert',
+                  filled: true,
+                  fillColor: AppColors.cardDark,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  prefixIcon: const Icon(Icons.edit_note, color: AppColors.ymcaOrange),
                 ),
                 maxLength: 50,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-                onChanged: (_) => setState(() {}), // Trigger preview update
+                validator: (value) => (value == null || value.trim().isEmpty) ? 'Please enter a title' : null,
+                onChanged: (_) => setState(() {}),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // Body
-              const Text('Message', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
+              // Message
               TextFormField(
                 controller: _bodyController,
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'e.g., The pool will be closed for maintenance from 8am-12pm',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  prefixIcon: const Icon(Icons.message),
+                  labelText: 'Message Body',
+                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                  hintText: 'Keep it short and actionable...',
+                  filled: true,
+                  fillColor: AppColors.cardDark,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  prefixIcon: const Icon(Icons.chat_bubble_outline, color: AppColors.ymcaOrange),
                 ),
-                maxLines: 4,
-                maxLength: 200,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter a message';
-                  }
-                  return null;
-                },
-                onChanged: (_) => setState(() {}), // Trigger preview update
+                maxLines: 3,
+                maxLength: 160,
+                validator: (value) => (value == null || value.trim().isEmpty) ? 'Please enter a message' : null,
+                onChanged: (_) => setState(() {}),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // Target Audience
-              const Text('Send To', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
+              // Target
               DropdownButtonFormField<String>(
                 value: _selectedTarget,
+                dropdownColor: AppColors.cardDark,
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  prefixIcon: const Icon(Icons.people),
+                  labelText: 'Primary Audience',
+                  labelStyle: const TextStyle(color: AppColors.textSecondary),
+                  filled: true,
+                  fillColor: AppColors.cardDark,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  prefixIcon: const Icon(Icons.groups_outlined, color: AppColors.ymcaGreen),
                 ),
-                items: _targetLabels.entries.map((entry) {
-                  return DropdownMenuItem(
-                    value: entry.key,
-                    child: Text(entry.value),
-                  );
-                }).toList(),
+                items: _targetLabels.entries.map((entry) => DropdownMenuItem(value: entry.key, child: Text(entry.value))).toList(),
                 onChanged: (value) => setState(() => _selectedTarget = value!),
               ),
               const SizedBox(height: 32),
 
               // Send Button
-              ElevatedButton.icon(
+              ElevatedButton(
                 onPressed: _isSending ? null : _sendNotification,
-                icon: _isSending 
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Icon(Icons.send),
-                label: Text(_isSending ? 'Sending...' : 'Send Notification'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.ymcaBlue,
+                  backgroundColor: AppColors.ymcaOrange,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 8,
+                  shadowColor: AppColors.ymcaOrange.withOpacity(0.4),
                 ),
+                child: _isSending 
+                    ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Text('DEploy Notification', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.1)),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
-              // Info Card
-              Card(
-                color: Colors.blue.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Colors.blue.shade700),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Notifications are sent instantly to all users in the selected group.',
-                          style: TextStyle(fontSize: 12, color: Colors.blue.shade900),
-                        ),
+              // Security Check
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.ymcaGreen.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.ymcaGreen.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.shield_outlined, color: AppColors.ymcaGreen, size: 18),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Enterprise Shield active. This notification will be logged for compliance.',
+                        style: TextStyle(fontSize: 12, color: AppColors.ymcaGreen.withOpacity(0.8)),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
+              const SizedBox(height: 40),
             ],
           ),
         ),

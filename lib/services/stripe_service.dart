@@ -17,13 +17,14 @@ class StripeService {
 
   /// Initialize Stripe (Call this in main.dart)
   void init() {
-    // TODO: Replace with your Publishable Key from Stripe Dashboard
-    Stripe.publishableKey = "pk_test_51NwLAvDyP48nofc82aAQ2TeeCfBbw1xPjN7TloZzPlWBVRcRu9dSTMCfd1pYMXWLMJkaEHc40rmvRL30tS2eGx7V00qtBQw63e"; 
-    // Usually starts with pk_test_...
-    
-    // if (kIsWeb) {
-    //   await Stripe.instance.applySettings();
-    // }
+    // Key is injected at build time via --dart-define to avoid committing to source control.
+    // Run with: flutter run --dart-define=STRIPE_PK=pk_test_...
+    const stripeKey = String.fromEnvironment('STRIPE_PK', defaultValue: '');
+    if (stripeKey.isEmpty) {
+      debugPrint('⚠️ STRIPE_PK not set. Run with --dart-define=STRIPE_PK=pk_test_...');
+      return;
+    }
+    Stripe.publishableKey = stripeKey;
   }
 
   /// Main flow to manage a payment

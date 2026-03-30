@@ -37,7 +37,7 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                 icon: Icons.people_alt,
                 title: 'User Management',
                 subtitle: 'View and edit registered members (Firestore)',
-                color: Colors.purple,
+                color: AppColors.ymcaGreen,
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminUsersScreen())),
               ),
               const SizedBox(height: 16),
@@ -46,7 +46,7 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                 icon: Icons.notifications_active,
                 title: 'Send Push Notification',
                 subtitle: 'Send announcements to all users',
-                color: Colors.deepOrange,
+                color: Colors.amber,
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SendNotificationScreen())),
               ),
               const SizedBox(height: 16),
@@ -55,7 +55,7 @@ class _ManagerDashboardState extends ConsumerState<ManagerDashboard> {
                 icon: Icons.verified_user, // Was Icons.security
                 title: 'Income Verification',
                 subtitle: 'Review uploaded documents',
-                color: Colors.orange,
+                color: AppColors.ymcaOrange,
                 onTap: () {
                    // Placeholder for document review screen
                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Verification Queue: 0 Pending')));

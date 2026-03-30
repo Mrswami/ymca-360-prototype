@@ -136,3 +136,26 @@ exports.sendNotification = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('internal', 'Failed to send notification', error);
   }
 });
+
+/**
+ * 🥒 Pickleball Microservice
+ * Returns player profile data. 
+ * In a real SOA, this would fetch from DUPR API or Daxko.
+ */
+exports.getPickleballProfile = functions.https.onCall(async (data, context) => {
+  console.log("Fetching Pickleball Profile for:", data.playerId || "default");
+
+  // This data is now managed on the SERVER, not in the mobile app.
+  // We can change this data anytime without updating the app!
+  return {
+    playerId: data.playerId || "DUPR-88219",
+    fullName: "Jacob Moreno",
+    ratings: {
+      doubles: 4.12,
+      singles: 3.85
+    },
+    matches: 42,
+    lastUpdate: new Date().toISOString().split('T')[0],
+    profileImageUrl: "https://randomuser.me/api/portraits/men/32.jpg"
+  };
+});
