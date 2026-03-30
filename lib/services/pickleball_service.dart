@@ -29,11 +29,12 @@ class PickleballService {
       print('SOA Service Error: $e');
       // Fallback for demo if emulator isn't running
       return DuprPlayer(
-        playerId: "ERROR",
+        id: "ERROR",
         fullName: "Service Offline",
-        ratings: {"doubles": 0.0, "singles": 0.0},
-        matches: 0,
-        lastUpdate: "N/A",
+        doublesRating: 0.0,
+        singlesRating: 0.0,
+        totalMatches: 0,
+        lastUpdated: "N/A",
         profileImageUrl: ""
       );
     }
