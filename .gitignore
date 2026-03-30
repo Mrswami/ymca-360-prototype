@@ -54,4 +54,5 @@ functions/node_modules/
 # Local developer secrets (Stripe keys, etc.) — never commit these
 .env
 .env.local
+.env.json
 *.env

@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "YMCA Prototype (Android)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file=.env.json"
+            ]
+        },
+        {
+            "name": "YMCA Prototype (Chrome)",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "chrome",
+            "args": [
+                "--dart-define-from-file=.env.json"
+            ]
+        }
+    ]
+}
